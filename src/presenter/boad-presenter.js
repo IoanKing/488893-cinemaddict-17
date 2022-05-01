@@ -1,6 +1,5 @@
 import NewBoardView from '../view/board-view.js';
 import NewCardListView from '../view/card-list-view.js';
-import NewCardListExtraView from '../view/card-list-extra-view.js';
 import NewCardView from '../view/card-view.js';
 import NewSortView from '../view/sort-view.js';
 import NewButtonShowMoreView from '../view/button-show-view.js';
@@ -11,8 +10,8 @@ import {render} from '../render.js';
 export default class BoardPresenter {
   boardComponent = new NewBoardView();
   cardListComponent = new NewCardListView();
-  cardListExtra1Component = new NewCardListExtraView();
-  cardListExtra2Component = new NewCardListExtraView();
+  cardListExtra1Component = new NewCardListView(true);
+  cardListExtra2Component = new NewCardListView(true);
   cardContainerComponent = new NewCardListContainerView();
   cardExtraContainer1Component = new NewCardListContainerView();
   cardExtraContainer2Component = new NewCardListContainerView();
@@ -44,6 +43,6 @@ export default class BoardPresenter {
       render(new NewCardView(), this.cardExtraContainer2Component.getElement());
     }
 
-    render(new NewPopupView(), this.boardContainer);
+    //render(new NewPopupView(), this.boardContainer);
   };
 }
