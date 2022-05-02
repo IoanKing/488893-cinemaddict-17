@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import View from './view.js';
 
 const createFilterTemplate = () => `<nav class="main-navigation">
 <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
@@ -7,20 +7,12 @@ const createFilterTemplate = () => `<nav class="main-navigation">
 <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">8</span></a>
 </nav>`;
 
-export default class NewFilterView {
+export default class NewFilterView extends View {
+  constructor() {
+    super();
+  }
+
   getTemplate() {
     return createFilterTemplate();
-  }
-
-  getElement() {
-    if (!this.element)  {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

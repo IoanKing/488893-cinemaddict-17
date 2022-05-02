@@ -43,6 +43,6 @@ export default class BoardPresenter {
       render(new NewCardView(), this.cardExtraContainer2Component.getElement());
     }
 
-    //render(new NewPopupView(), this.boardContainer);
+    render(new NewPopupView(), this.boardContainer);
   };
 }
