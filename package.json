@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^4.9.2",
+    "dayjs": "1.11.1"
   }
 }
