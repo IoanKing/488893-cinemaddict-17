@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 /**
 * Функция возвращающая случайное целое число из переданного диапазона
 * включительно.
@@ -78,12 +80,24 @@ const getRandomArrayList = (list, maxRange = 10) => {
   return result;
 };
 
+/**
+ * Получение последнего дня месяца за заданный год и месяц.
+ * @param {number} year - год.
+ * @param {number} month - месяц.
+ * @returns - Последний день месяца.
+ */
 function getLastDayOfMonth(year, month) {
   const date = new Date(year, month + 1, 0);
   return date.getDate();
 }
 
-const generateDate = (min, max) => {
+/**
+ * Получение случаной даты в формате UTC за заданный период.
+ * @param {number} min - год начала периода.
+ * @param {number} max - год окончания периода.
+ * @returns {string} - Дата в формате UTC.
+ */
+const getRandomDate = (min, max) => {
   const year = getRandomNumber(min, max);
   const month = getRandomNumber(1,12);
   const day = getRandomNumber(1,31);
@@ -93,4 +107,47 @@ const generateDate = (min, max) => {
   return `${year}-${(month>=10)? month : `0${month}`}-${(correctDay>=10)? correctDay : `0${correctDay}`}T00:00:00.000Z`;
 };
 
-export {getRandomNumber, getRandomFloat, getRandomArrayElement, getRandomList, getRandomArrayList, generateDate};
+/**
+ * Получение человекочитаемого Года из даты в формате UTC.
+ * @param {string} date - дата в формате UTC.
+ * @returns - Год.
+ */
+const getYearDate = (date) => dayjs(date).format('YYYY');
+
+/**
+ * Получение человекочитаемого Года из даты в формате UTC.
+ * @param {string} date - дата в формате UTC.
+ * @returns - Год.
+ */
+const getHumanReadableDate = (date) => dayjs(date).format('DD MMM YYYY');
+
+/**
+ * Получение человекочитаемой даты для коммантериев из формата UTC.
+ * @param {string} date - дата в формате UTC.
+ * @returns {string} - Дата.
+ */
+const getCommentDate = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
+
+/**
+ * Получение человекочитаемой длительности фильма.
+ * @param {number} time - Длительность в минутах.
+ * @returns {string} - Длительность в часах и минутах.
+ */
+const getHumanReadableTime = (time) => {
+  const hours = Math.floor(time / 60);
+  const minutes = (hours > 0) ? time - (hours * 60) : time;
+  return `${(hours > 0) ? `${hours}h` : ''} ${(minutes > 0) ? `${minutes}m` : ''}`;
+};
+
+export {
+  getRandomNumber,
+  getRandomFloat,
+  getRandomArrayElement,
+  getRandomList,
+  getRandomArrayList,
+  getRandomDate,
+  getYearDate,
+  getHumanReadableTime,
+  getHumanReadableDate,
+  getCommentDate
+};

@@ -1,13 +1,14 @@
 import View from './view.js';
 
-const createStatisticTemplate = () => '<p>130 291 movies inside</p>';
+const createStatisticTemplate = (count) => `<p>${count} movies inside</p>`;
 
 export default class NewStatisticView extends View {
-  constructor() {
+  constructor(count) {
     super();
+    this.count = count;
   }
 
   getTemplate() {
-    return createStatisticTemplate();
+    return createStatisticTemplate(this.count);
   }
 }

@@ -1,4 +1,4 @@
-import {getRandomNumber, getRandomFloat, getRandomArrayElement, getRandomList, generateDate} from '../utils.js';
+import {getRandomNumber, getRandomFloat, getRandomArrayElement, getRandomList, getRandomDate} from '../utils.js';
 
 const Ratings = {
   MIN: 2,
@@ -42,13 +42,35 @@ const genres = [
 ];
 
 const descriptions = [
-  'Burlesque comic Ralph "Skid" Johnson (Skelly), and specialty dancer Bonny Lee King (Carroll), end up together on a cold, rainy night at a tr…',
-  'entenced for a murder he did not commit, John Brant escapes from prison determined to find the real killer. By chance Brant\'s narrow escap…',
-  'Frankie Machine (Frank Sinatra) is released from the federal Narcotic Farm in Lexington, Kentucky with a set of drums and a new outlook on…',
-  'The Martians Momar ("Mom Martian") and Kimar ("King Martian") are worried that their children Girmar ("Girl Martian") and Bomar ("Boy Marti…',
-  'In this short, Sindbad the Sailor (presumably Bluto playing a "role") proclaims himself, in song, to be the greatest sailor, adventurer and…',
-  'Frankie Machine (Frank Sinatra) is released from the federal Narcotic Farm in Lexington, Kentucky with a set of drums and a new outlook on…',
-  'The film opens following a murder at a cabaret in Mexico City in 1936, and then presents the events leading up to it in flashback. The Grea…',
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a augue sem. Mauris sodales libero a pulvinar molestie. In porttitor tellus quam, non congue quam malesuada eget. In in felis ut ante rutrum tempor. Proin nec sem sem. Aliquam erat volutpat. Praesent interdum dapibus viverra.',
+
+  'Integer eu mauris vel dolor tristique scelerisque id auctor orci. Duis euismod nibh sapien, ac congue libero scelerisque nec. Morbi lobortis tellus augue, a scelerisque elit rhoncus in. Nulla vitae laoreet diam, a blandit urna. Duis id libero ex. Cras vulputate congue ornare. Pellentesque dictum blandit purus nec congue.',
+
+  'Fusce vitae felis sit amet mauris congue sodales. Cras elementum finibus rhoncus. Fusce sed imperdiet mi. Maecenas venenatis ultrices lectus in venenatis. Nunc vitae scelerisque mauris. Praesent tincidunt dapibus elit sit amet dapibus. Proin dignissim ante eget justo tempor, vitae posuere quam sagittis. Aliquam sed odio consequat, molestie risus vitae, varius ex.',
+
+  'Vestibulum eleifend vel diam aliquet rutrum. Donec nec urna sapien. Nullam sit amet feugiat odio, sed volutpat justo. Cras diam massa, molestie quis vulputate eget, auctor at dui. Curabitur placerat justo eu ipsum facilisis varius. Sed quis elit non erat luctus lacinia sit amet eu nunc. Nulla eleifend faucibus congue.',
+
+  'Praesent pharetra augue at sem lobortis tempor. Proin eleifend congue lacus sit amet sagittis. Curabitur non diam facilisis, pellentesque lectus elementum, ultrices sem. Aliquam vel vulputate risus. In metus sem, fringilla dignissim massa in, faucibus blandit leo. Duis eget accumsan orci. Pellentesque sodales risus odio, sed venenatis lorem ultricies a. Maecenas eget scelerisque leo. Mauris et risus eu ipsum rutrum hendrerit. Donec ultricies id odio nec ullamcorper. Phasellus molestie auctor justo tincidunt venenatis. Nunc id tortor a neque egestas euismod. Aenean a lectus et ex dictum faucibus sit amet ut orci. Nulla nulla nibh, feugiat eu mi ut, ornare consectetur nisi. Nunc et augue ac sem dapibus porttitor vitae blandit nulla. Morbi ut malesuada felis.',
+
+  'Integer ut commodo quam. Cras ut arcu tortor. Nam orci orci, congue sed ante sed, porta luctus nulla. Integer varius lacus iaculis, accumsan ligula in, sollicitudin est. Fusce tellus orci, fermentum ut ullamcorper porta, pellentesque vitae nisl. Donec at elit eget tortor laoreet rutrum. Quisque ac commodo velit, a consectetur nulla. Vivamus eleifend porta augue eu malesuada.',
+
+  'Ut ac ipsum sed leo blandit ultrices. Praesent auctor, dolor ac pellentesque tristique, lectus ligula vehicula diam, eget scelerisque nulla nunc quis elit. Morbi arcu diam, sodales sodales urna ut, vulputate rhoncus eros. Etiam turpis massa, consectetur nec varius ac, condimentum vel odio. Donec in neque id nulla dapibus commodo. Ut felis enim, mollis eget pretium a, cursus ac nulla. Phasellus justo lectus, varius eget hendrerit id, tristique non nisl.',
+
+  'Nunc porttitor at ligula quis rhoncus. Sed gravida, velit eget ultrices efficitur, velit dui rhoncus mauris, quis mollis tortor sem eu neque. Vivamus cursus, massa id accumsan euismod, ante sapien semper risus, ac venenatis lorem eros vitae felis. Praesent feugiat mi vel finibus pretium. Nam orci felis, convallis ac dolor et, viverra auctor elit. Proin nec ante volutpat, ornare sem vehicula, faucibus libero. Aliquam ut sapien suscipit, feugiat mauris eu, feugiat nunc. Fusce at tincidunt felis. Cras ac mauris sed lectus tincidunt molestie. Etiam sed massa eu massa porttitor efficitur. Aenean dignissim sem ante, nec consequat eros efficitur et.',
+
+  'Nunc sodales mauris sed nibh convallis, sed pulvinar sapien cursus. Cras lacinia euismod pulvinar. Ut rhoncus ligula lacinia tortor auctor, at lobortis tortor interdum. Sed egestas leo sit amet mi ultricies, sodales varius mauris pharetra. Fusce blandit erat non mi aliquet fringilla. Aenean at ante vehicula, accumsan eros nec, fermentum neque. Aenean erat metus, vulputate sed urna ut, consectetur commodo quam. Sed sagittis posuere felis vitae lobortis. Phasellus rutrum, sem et mattis tristique, leo nunc luctus odio, vel imperdiet lacus magna vitae massa. Maecenas rutrum, ante eu blandit elementum, risus nunc feugiat leo, a tempor elit nibh sit amet leo. Aenean eget orci sed nibh semper semper. Nulla feugiat ipsum at felis sagittis, et porttitor justo dapibus. Cras ut sem est.',
+
+  'Proin nunc est, porta ultricies dictum eget, interdum et ante. In tellus risus, volutpat id erat sed, vehicula aliquam sem. Suspendisse pellentesque ac mi nec ultricies. Cras placerat tortor placerat est vehicula dignissim. Suspendisse vehicula hendrerit ipsum, ut rhoncus ante tempor nec. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas volutpat ex ac lorem pellentesque finibus. Quisque varius porta eros et blandit. Aenean quis magna nisl. Ut vitae mi a justo maximus sodales quis at nulla.',
+
+  'Vestibulum et velit vitae eros hendrerit condimentum vel eget sapien. Fusce vel consequat ligula, ut ultricies magna. In tempor id dolor in porttitor. Morbi tristique commodo faucibus. Pellentesque iaculis quam nisl, feugiat sollicitudin ligula tristique dignissim. Nunc eget leo felis. Quisque a arcu quis ipsum tincidunt tincidunt vel ut dui. Nam erat sapien, consequat eget dui vitae, congue hendrerit erat. Integer iaculis metus sed pharetra molestie. Morbi tristique vehicula justo, euismod ultricies lectus interdum sit amet. Aenean vel est congue odio malesuada egestas vitae sit amet sem. Vestibulum sagittis urna lorem, in imperdiet risus ornare quis.',
+
+  'Praesent faucibus non erat at cursus. Duis tempus lacus vel magna ultrices imperdiet. Sed eget ornare sem, non posuere quam. Maecenas id maximus dui. Quisque est neque, molestie tincidunt arcu at, maximus mollis erat. Ut arcu arcu, placerat non gravida sit amet, dictum in mi. Etiam condimentum accumsan velit rutrum varius. Donec tincidunt porta pellentesque.',
+
+  'Donec dictum dolor vulputate convallis condimentum. Quisque in nisl ac mi lacinia lacinia. Sed id semper dui. Vestibulum pellentesque nibh non ipsum eleifend imperdiet. Cras efficitur, urna at accumsan fermentum, lectus tellus ultricies purus, eget vehicula metus odio ultrices nisl. Praesent blandit, est quis vulputate pharetra, dui nulla pulvinar lacus, quis finibus elit magna varius libero. Duis vulputate luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu augue sollicitudin, consequat ipsum lobortis, bibendum risus. Sed luctus mollis ultrices. Nam blandit turpis sit amet aliquet vestibulum.',
+
+  'In nec suscipit enim. Vestibulum at arcu at diam laoreet ultricies in hendrerit sem. Curabitur rhoncus id mauris ut finibus. Pellentesque tincidunt est non cursus mattis. Nunc faucibus felis quis sem semper tincidunt. Pellentesque velit risus, molestie dignissim porttitor imperdiet, iaculis vulputate mauris. Praesent id ante malesuada, sodales est a, faucibus nunc. Fusce et mauris est. Cras placerat aliquet nibh vel egestas. Proin id maximus turpis.',
+
+  'Vivamus id neque mauris. Sed commodo sollicitudin finibus. Duis egestas dui velit, sit amet cursus dolor tristique sit amet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec dui justo, vehicula sit amet tempor ac, lacinia at velit. Praesent eget lorem commodo, dictum risus at, tempus diam. In accumsan, libero sed interdum tempus, lectus tortor ultricies tellus, id ullamcorper velit leo eu massa.'
 ];
 
 const alternativeTitles = [
@@ -337,16 +359,16 @@ export const genereteMovieInfo = () => ({
   title: getRandomArrayElement(titles),
   alternativeTitle: getRandomArrayElement(alternativeTitles),
   totalRating: getRandomFloat(Ratings.MIN,Ratings.MAX,1),
-  poster: `/public/images/posters/${getRandomArrayElement(posters)}`,
+  poster: getRandomArrayElement(posters),
   ageRating: getRandomArrayElement(ageRatings),
   director: getRandomArrayElement(peoples),
   writers: getRandomList(peoples),
   actors: getRandomList(peoples),
   release: {
-    date: generateDate(Years.MIN, Years.MAX),
+    date: getRandomDate(Years.MIN, Years.MAX),
     releaseCountry: getRandomArrayElement(countries)
   },
-  runtime: getRandomNumber(70, 100),
+  runtime: getRandomNumber(10, 180),
   genre: getRandomList(genres),
   description: getRandomArrayElement(descriptions)
 });

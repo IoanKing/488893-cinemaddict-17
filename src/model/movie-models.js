@@ -1,7 +1,7 @@
 import {generateCard} from '../mock/movie.js';
 
 export default class CardModel {
-  datas = Array.from({length: 5}, generateCard);
+  data = Array.from({length: 200}, generateCard);
 
-  getData = () => this.datas;
+  getData = () => this.data;
 }

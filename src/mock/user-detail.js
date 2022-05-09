@@ -1,4 +1,4 @@
-import {generateDate} from '../utils.js';
+import {getRandomDate, getRandomNumber} from '../utils.js';
 
 const Years = {
   MIN: 2015,
@@ -6,8 +6,8 @@ const Years = {
 };
 
 export const generateUserDetails = () => ({
-  watchlist: false,
-  isAlreadyWatched: generateDate(Years.MIN, Years.MAX),
-  watchingDate: false,
-  favorite: false,
+  watchlist: Boolean(getRandomNumber(0, 1)),
+  isAlreadyWatched: Boolean(getRandomNumber(0, 1)),
+  watchingDate: getRandomDate(Years.MIN, Years.MAX),
+  favorite: Boolean(getRandomNumber(0, 1)),
 });

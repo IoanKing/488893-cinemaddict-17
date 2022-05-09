@@ -1,14 +1,15 @@
 import View from './view.js';
 
-const createCardListTemplate = (isExtra) => `<section class="films-list ${(isExtra) ? 'films-list--extra': ''}"><h2 class="films-list__title ${(isExtra) ? '': 'visually-hidden'}">All movies. Upcoming</h2></section>`;
+const createCardListTemplate = (isExtra, title) => `<section class="films-list ${(isExtra) ? 'films-list--extra': ''}"><h2 class="films-list__title ${(isExtra) ? '': 'visually-hidden'}">${title}</h2></section>`;
 
 export default class NewCardListView extends View  {
-  constructor(isExtra = false) {
+  constructor(isExtra = false, title = 'All movies. Upcoming') {
     super();
     this.isExtra = isExtra;
+    this.title = title;
   }
 
   getTemplate() {
-    return createCardListTemplate(this.isExtra);
+    return createCardListTemplate(this.isExtra, this.title);
   }
 }
