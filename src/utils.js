@@ -1,4 +1,11 @@
 import dayjs from 'dayjs';
+import dayjsRandom from 'dayjs-random';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(dayjsRandom);
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 /**
 * Функция возвращающая случайное целое число из переданного диапазона
@@ -81,30 +88,16 @@ const getRandomArrayList = (list, maxRange = 10) => {
 };
 
 /**
- * Получение последнего дня месяца за заданный год и месяц.
- * @param {number} year - год.
- * @param {number} month - месяц.
- * @returns - Последний день месяца.
- */
-function getLastDayOfMonth(year, month) {
-  const date = new Date(year, month + 1, 0);
-  return date.getDate();
-}
-
-/**
  * Получение случаной даты в формате UTC за заданный период.
  * @param {number} min - год начала периода.
  * @param {number} max - год окончания периода.
  * @returns {string} - Дата в формате UTC.
  */
 const getRandomDate = (min, max) => {
-  const year = getRandomNumber(min, max);
-  const month = getRandomNumber(1,12);
-  const day = getRandomNumber(1,31);
-  const lastMonthDay = getLastDayOfMonth(year, month);
-  const correctDay = (lastMonthDay < day) ? lastMonthDay : day;
+  const beginDate = dayjs(new Date(min, 1, 1));
+  const endDate = dayjs(new Date(max, 1, 1));
 
-  return `${year}-${(month>=10)? month : `0${month}`}-${(correctDay>=10)? correctDay : `0${correctDay}`}T00:00:00.000Z`;
+  return dayjs.between(beginDate, endDate).format();
 };
 
 /**
@@ -134,9 +127,13 @@ const getCommentDate = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
  * @returns {string} - Длительность в часах и минутах.
  */
 const getHumanReadableTime = (time) => {
-  const hours = Math.floor(time / 60);
-  const minutes = (hours > 0) ? time - (hours * 60) : time;
-  return `${(hours > 0) ? `${hours}h` : ''} ${(minutes > 0) ? `${minutes}m` : ''}`;
+  let result = '';
+  const durations = dayjs.duration(time, 'minutes');
+  const hours = durations.hours();
+  const minutes = durations.minutes();
+  result += (hours > 0) ? `${hours}h ` : '';
+  result += `${minutes}m`;
+  return result;
 };
 
 export {

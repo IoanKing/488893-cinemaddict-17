@@ -7,8 +7,8 @@ import NewCardListContainerView from '../view/card-list-container-view.js';
 import {render} from '../render.js';
 import NewPopupView from '../view/popup-view.js';
 
-const MAX_DEFALT_MOVIES = 5;
-const MAX_EXTRA_MOVIES = 2;
+const COUNT_LIST_MOVIES = 5;
+const COUNT_LIST_ADDITIONAL = 2;
 
 export default class BoardPresenter {
   boardComponent = new NewBoardView();
@@ -31,7 +31,12 @@ export default class BoardPresenter {
     render(this.cardListComponent, this.boardComponent.getElement());
     render(this.cardComponent, this.cardListComponent.getElement());
 
-    for (let i = 0; i < Math.min(this.boardCards.length, MAX_DEFALT_MOVIES); i++) {
+    //Определение количества отображаемых карточек фильмов для основного блока.
+    const defaultListCount = Math.min(this.boardCards.length, COUNT_LIST_MOVIES);
+    //Определение количества отображаемых карточек фильмов для дополнительных блоков «Top rated movies» и «Most commented».
+    const additionalListCount = Math.min(this.boardCards.length, COUNT_LIST_ADDITIONAL);
+
+    for (let i = 0; i < defaultListCount; i++) {
       render(new NewCardView(this.boardCards[i]), this.cardComponent.getElement());
     }
 
@@ -42,11 +47,11 @@ export default class BoardPresenter {
     render(this.cardTopRatedComponent, this.topListComponent.getElement());
     render(this.cardCommentedComponent, this.commentedListComponent.getElement());
 
-    for (let i = 0; i < Math.min(this.boardCards.length, MAX_EXTRA_MOVIES); i++) {
+    for (let i = 0; i < additionalListCount; i++) {
       render(new NewCardView(this.boardCards[i]), this.cardTopRatedComponent.getElement());
     }
 
-    for (let i = 0; i < Math.min(this.boardCards.length, MAX_EXTRA_MOVIES); i++) {
+    for (let i = 0; i < additionalListCount; i++) {
       render(new NewCardView(this.boardCards[i]), this.cardCommentedComponent.getElement());
     }
 
