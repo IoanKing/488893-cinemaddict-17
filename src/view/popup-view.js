@@ -174,13 +174,16 @@ const createPopupTemplate = (data, comments) => {
 };
 
 export default class NewPopupView extends View {
+  #data = null;
+  #comments = null;
+
   constructor(data, comments) {
     super();
-    this.data = data;
-    this.comments = comments;
+    this.#data = data;
+    this.#comments = comments;
   }
 
-  getTemplate() {
-    return createPopupTemplate(this.data, this.comments);
+  get template() {
+    return createPopupTemplate(this.#data, this.#comments);
   }
 }

@@ -11,7 +11,7 @@ export default class NewFilterView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createFilterTemplate();
   }
 }

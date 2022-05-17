@@ -23,13 +23,13 @@ export default class BoardPresenter {
     this.boardContainer = boardContainer;
     this.movieModel = movieModel;
     this.commentModel = commentModel;
-    this.boardCards  = [...this.movieModel.getData()];
-    this.boardComments  = [...this.commentModel.getData()];
+    this.boardCards  = [...this.movieModel.data];
+    this.boardComments  = [...this.commentModel.data];
 
     render(new NewSortView(), this.boardContainer);
     render(this.boardComponent, this.boardContainer);
-    render(this.cardListComponent, this.boardComponent.getElement());
-    render(this.cardComponent, this.cardListComponent.getElement());
+    render(this.cardListComponent, this.boardComponent.element);
+    render(this.cardComponent, this.cardListComponent.element);
 
     //Определение количества отображаемых карточек фильмов для основного блока.
     const defaultListCount = Math.min(this.boardCards.length, COUNT_LIST_MOVIES);
@@ -37,22 +37,22 @@ export default class BoardPresenter {
     const additionalListCount = Math.min(this.boardCards.length, COUNT_LIST_ADDITIONAL);
 
     for (let i = 0; i < defaultListCount; i++) {
-      render(new NewCardView(this.boardCards[i]), this.cardComponent.getElement());
+      render(new NewCardView(this.boardCards[i]), this.cardComponent.element);
     }
 
-    render(new NewButtonShowMoreView(), this.cardListComponent.getElement());
+    render(new NewButtonShowMoreView(), this.cardListComponent.element);
 
-    render(this.topListComponent, this.boardComponent.getElement());
-    render(this.commentedListComponent, this.boardComponent.getElement());
-    render(this.cardTopRatedComponent, this.topListComponent.getElement());
-    render(this.cardCommentedComponent, this.commentedListComponent.getElement());
+    render(this.topListComponent, this.boardComponent.element);
+    render(this.commentedListComponent, this.boardComponent.element);
+    render(this.cardTopRatedComponent, this.topListComponent.element);
+    render(this.cardCommentedComponent, this.commentedListComponent.element);
 
     for (let i = 0; i < additionalListCount; i++) {
-      render(new NewCardView(this.boardCards[i]), this.cardTopRatedComponent.getElement());
+      render(new NewCardView(this.boardCards[i]), this.cardTopRatedComponent.element);
     }
 
     for (let i = 0; i < additionalListCount; i++) {
-      render(new NewCardView(this.boardCards[i]), this.cardCommentedComponent.getElement());
+      render(new NewCardView(this.boardCards[i]), this.cardCommentedComponent.element);
     }
 
     const firstCard = this.boardCards[0];

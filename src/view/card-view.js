@@ -55,20 +55,14 @@ const createCardTemplate = (data) => {
 
 /** Класс карточки фильма. */
 export default class NewCardView extends View {
-  /**
-   * Создание карточки фильма.
-   * @param {object} card - Данные карточки.
-   */
+  #card = null;
+
   constructor(card) {
     super();
-    this.card = card;
+    this.#card = card;
   }
 
-  /**
-   * Получение сгенерированного шаблона карточки.
-   * @returns - Сгенерированный шаблон карточки.
-   */
-  getTemplate() {
-    return createCardTemplate(this.card);
+  get template() {
+    return createCardTemplate(this.#card);
   }
 }

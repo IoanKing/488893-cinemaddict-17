@@ -10,7 +10,7 @@ export default class NewProffileView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createProffileTemplate();
   }
 }

@@ -7,7 +7,7 @@ export default class NewButtonShowMoreView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createButtonShowMoreTemplate();
   }
 }
