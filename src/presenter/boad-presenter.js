@@ -82,7 +82,7 @@ export default class BoardPresenter {
         this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
       }
     }
-  }
+  };
 
   #renderCard = (card, elementComponent) => {
     const cardComponent = new NewCardView(card);
