@@ -24,6 +24,9 @@ export default class BoardPresenter {
   #cardComponent = new NewCardListContainerView();
   #cardTopRatedComponent = new NewCardListContainerView();
   #cardCommentedComponent = new NewCardListContainerView();
+  #showMoreButtonComponent = new NewButtonShowMoreView();
+
+  #renderedCardCount = COUNT_LIST_MOVIES;
 
   init = (boardContainer, movieModel, commentModel) => {
     this.#boardContainer = boardContainer;
@@ -46,7 +49,11 @@ export default class BoardPresenter {
       this.#renderCard(this.#boardCards[i], this.#cardComponent.element);
     }
 
-    render(new NewButtonShowMoreView(), this.#cardListComponent.element);
+    if (this.#boardCards.length > COUNT_LIST_MOVIES) {
+      render(this.#showMoreButtonComponent, this.#boardComponent.element);
+
+      this.#showMoreButtonComponent.element.addEventListener('click', this.#onLoadMoreButtonClick);
+    }
 
     render(this.#topListComponent, this.#boardComponent.element);
     render(this.#commentedListComponent, this.#boardComponent.element);
@@ -54,11 +61,11 @@ export default class BoardPresenter {
     render(this.#cardCommentedComponent, this.#commentedListComponent.element);
 
     for (let i = 0; i < additionalListCount; i++) {
-      this.#renderCard(this.#boardCards[i], this.#cardComponent.element);
+      this.#renderCard(this.#boardCards[i], this.#cardTopRatedComponent.element);
     }
 
     for (let i = 0; i < additionalListCount; i++) {
-      this.#renderCard(this.#boardCards[i], this.#cardComponent.element);
+      this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
     }
   };
 
@@ -106,5 +113,19 @@ export default class BoardPresenter {
     });
 
     render(cardComponent, elementComponent);
+  };
+
+  #onLoadMoreButtonClick = (evt) => {
+    evt.preventDefault();
+    this.#boardCards
+      .slice(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES)
+      .forEach((card) => this.#renderCard(card, this.#cardComponent.element));
+
+    this.#renderedCardCount += COUNT_LIST_MOVIES;
+
+    if (this.#renderedCardCount >= this.#boardCards.length) {
+      this.#showMoreButtonComponent.element.remove();
+      this.#showMoreButtonComponent.removeElement();
+    }
   };
 }
