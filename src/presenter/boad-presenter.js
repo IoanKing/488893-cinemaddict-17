@@ -68,22 +68,41 @@ export default class BoardPresenter {
     const cardComponent = new NewCardView(card);
     const cardComments = this.#boardComments.filter((values) => card.comments.includes(values.id));
     const popupComponent = new NewPopupView(card, cardComments);
+    const bodyElement = document.querySelector('body');
 
     const addPopup = () => {
-      this.#boardContainer.appendChild(popupComponent);
+      this.#boardContainer.appendChild(popupComponent.element);
+      bodyElement.classList.add('hide-overflow');
     };
 
     const removePopup = () => {
-      this.#boardContainer.removeChild(popupComponent);
+      this.#boardContainer.removeChild(popupComponent.element);
+      bodyElement.classList.remove('hide-overflow');
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        removePopup();
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
     };
 
     cardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
       addPopup();
+      document.addEventListener('keydown', onEscKeyDown);
     });
 
-    popupComponent.element.querySelector('form').addEventListener('submit', (evt) => {
+    popupComponent.element.querySelector('.film-details__close-btn').addEventListener('submit', (evt) => {
       evt.preventDefault();
       removePopup();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    popupComponent.element.querySelector('form').addEventListener('click', (evt) => {
+      evt.preventDefault();
+      removePopup();
+      document.removeEventListener('keydown', onEscKeyDown);
     });
 
     render(cardComponent, elementComponent);
