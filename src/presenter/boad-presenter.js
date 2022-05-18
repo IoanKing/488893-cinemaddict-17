@@ -6,6 +6,7 @@ import NewButtonShowMoreView from '../view/button-show-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
 import {render} from '../render.js';
 import NewPopupView from '../view/popup-view.js';
+import NoCardView from '../view/no-card-view.js';
 
 const COUNT_LIST_MOVIES = 5;
 const COUNT_LIST_ADDITIONAL = 2;
@@ -45,14 +46,17 @@ export default class BoardPresenter {
     //Определение количества отображаемых карточек фильмов для дополнительных блоков «Top rated movies» и «Most commented».
     const additionalListCount = Math.min(this.#boardCards.length, COUNT_LIST_ADDITIONAL);
 
-    for (let i = 0; i < defaultListCount; i++) {
-      this.#renderCard(this.#boardCards[i], this.#cardComponent.element);
-    }
+    if (this.#boardCards.length === 0) {
+      render(new NoCardView(), this.#cardComponent.element);
+    } else {
+      for (let i = 0; i < defaultListCount; i++) {
+        this.#renderCard(this.#boardCards[i], this.#cardComponent.element);
+      }
 
-    if (this.#boardCards.length > COUNT_LIST_MOVIES) {
-      render(this.#showMoreButtonComponent, this.#boardComponent.element);
-
-      this.#showMoreButtonComponent.element.addEventListener('click', this.#onLoadMoreButtonClick);
+      if (this.#boardCards.length > COUNT_LIST_MOVIES) {
+        render(this.#showMoreButtonComponent, this.#boardComponent.element);
+        this.#showMoreButtonComponent.element.addEventListener('click', this.#onLoadMoreButtonClick);
+      }
     }
 
     render(this.#topListComponent, this.#boardComponent.element);
@@ -60,12 +64,17 @@ export default class BoardPresenter {
     render(this.#cardTopRatedComponent, this.#topListComponent.element);
     render(this.#cardCommentedComponent, this.#commentedListComponent.element);
 
-    for (let i = 0; i < additionalListCount; i++) {
-      this.#renderCard(this.#boardCards[i], this.#cardTopRatedComponent.element);
-    }
+    if (this.#boardCards.length === 0) {
+      render(new NoCardView(), this.#cardTopRatedComponent.element);
+      render(new NoCardView(), this.#cardCommentedComponent.element);
+    } else {
+      for (let i = 0; i < additionalListCount; i++) {
+        this.#renderCard(this.#boardCards[i], this.#cardTopRatedComponent.element);
+      }
 
-    for (let i = 0; i < additionalListCount; i++) {
-      this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
+      for (let i = 0; i < additionalListCount; i++) {
+        this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
+      }
     }
   };
 
