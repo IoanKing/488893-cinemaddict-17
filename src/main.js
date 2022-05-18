@@ -9,7 +9,6 @@ import CommentModel from './model/comment-models.js';
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteStatisticsElement = document.querySelector('.footer__statistics');
-const boardPresenter = new BoardPresenter();
 const commentModel = new CommentModel();
 const commentIds = commentModel.data.map((element) => element.id);
 const cardModel = new CardModel(commentIds);
@@ -18,4 +17,7 @@ const cardCount = cardModel.data.length;
 render(new NewProffileView(), siteHeaderElement);
 render(new NewFilterView(), siteMainElement);
 render(new NewStatisticView(cardCount), siteStatisticsElement);
-boardPresenter.init(siteMainElement, cardModel, commentModel);
+
+const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel);
+
+boardPresenter.init();

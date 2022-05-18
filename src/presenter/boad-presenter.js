@@ -29,13 +29,19 @@ export default class BoardPresenter {
 
   #renderedCardCount = COUNT_LIST_MOVIES;
 
-  init = (boardContainer, movieModel, commentModel) => {
+  constructor(boardContainer, movieModel, commentModel) {
     this.#boardContainer = boardContainer;
     this.#movieModel = movieModel;
     this.#commentModel = commentModel;
+  }
+
+  init = () => {
     this.#boardCards  = [...this.#movieModel.data];
     this.#boardComments  = [...this.#commentModel.data];
+    this.#renderBoard();
+  };
 
+  #renderBoard = () => {
     render(new NewSortView(), this.#boardContainer);
     render(this.#boardComponent, this.#boardContainer);
     render(this.#cardListComponent, this.#boardComponent.element);
@@ -76,9 +82,7 @@ export default class BoardPresenter {
         this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
       }
     }
-  };
-
-  //render(new NewPopupView(firstCard, cardComments), this.boardContainer);
+  }
 
   #renderCard = (card, elementComponent) => {
     const cardComponent = new NewCardView(card);
