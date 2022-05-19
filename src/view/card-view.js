@@ -18,7 +18,7 @@ const getDescriptionShort = (text) => `${text.substring(0, MAX_TEXT_LENGTH)}${(t
 const createCardTemplate = (data) => {
   const {title, totalRating, poster, description, genre, runtime, release} = data.filmInfo;
   const {watchlist, isAlreadyWatched, favorite} = data.userDetails;
-  const commentCount = data.comments.length;
+  const commentCount = data.comments.size;
 
   const watchListClassName = watchlist
     ? 'film-card__controls-item--active'

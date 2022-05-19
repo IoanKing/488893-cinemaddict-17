@@ -6,7 +6,7 @@ let movieCount = 0;
 
 export const generateCard = () => ({
   id: movieCount++,
-  comments: Array.from({length: getRandomNumber(0, 100)}, () => getRandomNumber(0, 200)),
+  comments: new Set(Array.from({length: getRandomNumber(0, 100)}, () => getRandomNumber(0, 200))),
   filmInfo: genereteMovieInfo(),
   userDetails: generateUserDetails()
 });

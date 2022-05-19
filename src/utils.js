@@ -7,6 +7,9 @@ dayjs.extend(dayjsRandom);
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
+const ESC_ALL_BROWSERS = 'Escape';
+const ESC_IE = 'Esc';
+
 /**
 * Функция возвращающая случайное целое число из переданного диапазона
 * включительно.
@@ -136,6 +139,12 @@ const getHumanReadableTime = (time) => {
   return result;
 };
 
+/**
+ * Проверка нажатия клавишы ESC.
+ * @returns {boolean}
+ */
+const onEscKeydown = (evt) => evt.key === ESC_ALL_BROWSERS || evt.key === ESC_IE;
+
 export {
   getRandomNumber,
   getRandomFloat,
@@ -146,5 +155,6 @@ export {
   getYearDate,
   getHumanReadableTime,
   getHumanReadableDate,
-  getCommentDate
+  getCommentDate,
+  onEscKeydown
 };

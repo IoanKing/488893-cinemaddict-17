@@ -7,6 +7,7 @@ import NewCardListContainerView from '../view/card-list-container-view.js';
 import {render} from '../render.js';
 import NewPopupView from '../view/popup-view.js';
 import NoCardView from '../view/no-card-view.js';
+import {onEscKeydown} from '../utils.js';
 
 const COUNT_LIST_MOVIES = 5;
 const COUNT_LIST_ADDITIONAL = 2;
@@ -14,6 +15,8 @@ const COUNT_LIST_ADDITIONAL = 2;
 export default class BoardPresenter {
   #boardContainer = null;
   #boardCards = null;
+  #boardCardsTop = null;
+  #boardCardsCommented = null;
   #boardComments = null;
   #movieModel = null;
   #commentModel = null;
@@ -76,9 +79,6 @@ export default class BoardPresenter {
     } else {
       for (let i = 0; i < additionalListCount; i++) {
         this.#renderCard(this.#boardCards[i], this.#cardTopRatedComponent.element);
-      }
-
-      for (let i = 0; i < additionalListCount; i++) {
         this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
       }
     }
@@ -86,7 +86,7 @@ export default class BoardPresenter {
 
   #renderCard = (card, elementComponent) => {
     const cardComponent = new NewCardView(card);
-    const cardComments = this.#boardComments.filter((values) => card.comments.includes(values.id));
+    const cardComments = this.#boardComments.filter((values) => card.comments.has(values.id));
     const popupComponent = new NewPopupView(card, cardComments);
     const bodyElement = document.querySelector('body');
 
@@ -100,29 +100,29 @@ export default class BoardPresenter {
       bodyElement.classList.remove('hide-overflow');
     };
 
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
+    const onKeyDown = (evt) => {
+      if (onEscKeydown(evt)) {
         evt.preventDefault();
         removePopup();
-        document.removeEventListener('keydown', onEscKeyDown);
+        document.removeEventListener('keydown', onKeyDown);
       }
     };
 
     cardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
       addPopup();
-      document.addEventListener('keydown', onEscKeyDown);
+      document.addEventListener('keydown', onKeyDown);
     });
 
     popupComponent.element.querySelector('.film-details__close-btn').addEventListener('submit', (evt) => {
       evt.preventDefault();
       removePopup();
-      document.removeEventListener('keydown', onEscKeyDown);
+      document.removeEventListener('keydown', onKeyDown);
     });
 
     popupComponent.element.querySelector('form').addEventListener('click', (evt) => {
       evt.preventDefault();
       removePopup();
-      document.removeEventListener('keydown', onEscKeyDown);
+      document.removeEventListener('keydown', onKeyDown);
     });
 
     render(cardComponent, elementComponent);
