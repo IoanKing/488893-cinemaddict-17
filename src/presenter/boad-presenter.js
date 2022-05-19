@@ -66,17 +66,11 @@ export default class BoardPresenter {
         render(this.#showMoreButtonComponent, this.#boardComponent.element);
         this.#showMoreButtonComponent.element.addEventListener('click', this.#onLoadMoreButtonClick);
       }
-    }
 
-    render(this.#topListComponent, this.#boardComponent.element);
-    render(this.#commentedListComponent, this.#boardComponent.element);
-    render(this.#cardTopRatedComponent, this.#topListComponent.element);
-    render(this.#cardCommentedComponent, this.#commentedListComponent.element);
-
-    if (this.#boardCards.length === 0) {
-      render(new NoCardView(), this.#cardTopRatedComponent.element);
-      render(new NoCardView(), this.#cardCommentedComponent.element);
-    } else {
+      render(this.#topListComponent, this.#boardComponent.element);
+      render(this.#commentedListComponent, this.#boardComponent.element);
+      render(this.#cardTopRatedComponent, this.#topListComponent.element);
+      render(this.#cardCommentedComponent, this.#commentedListComponent.element);
       for (let i = 0; i < additionalListCount; i++) {
         this.#renderCard(this.#boardCards[i], this.#cardTopRatedComponent.element);
         this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
