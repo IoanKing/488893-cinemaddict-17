@@ -18,7 +18,7 @@ const getDescriptionShort = (text) => `${text.substring(0, MAX_TEXT_LENGTH)}${(t
 const createCardTemplate = (data) => {
   const {title, totalRating, poster, description, genre, runtime, release} = data.filmInfo;
   const {watchlist, isAlreadyWatched, favorite} = data.userDetails;
-  const commentCount = data.comments.length;
+  const commentCount = data.comments.size;
 
   const watchListClassName = watchlist
     ? 'film-card__controls-item--active'
@@ -55,20 +55,14 @@ const createCardTemplate = (data) => {
 
 /** Класс карточки фильма. */
 export default class NewCardView extends View {
-  /**
-   * Создание карточки фильма.
-   * @param {object} card - Данные карточки.
-   */
+  #card = null;
+
   constructor(card) {
     super();
-    this.card = card;
+    this.#card = card;
   }
 
-  /**
-   * Получение сгенерированного шаблона карточки.
-   * @returns - Сгенерированный шаблон карточки.
-   */
-  getTemplate() {
-    return createCardTemplate(this.card);
+  get template() {
+    return createCardTemplate(this.#card);
   }
 }

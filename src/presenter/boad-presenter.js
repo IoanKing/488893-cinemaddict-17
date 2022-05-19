@@ -6,58 +6,133 @@ import NewButtonShowMoreView from '../view/button-show-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
 import {render} from '../render.js';
 import NewPopupView from '../view/popup-view.js';
+import NoCardView from '../view/no-card-view.js';
+import {onEscKeydown} from '../utils.js';
 
 const COUNT_LIST_MOVIES = 5;
 const COUNT_LIST_ADDITIONAL = 2;
 
 export default class BoardPresenter {
-  boardComponent = new NewBoardView();
-  cardListComponent = new NewCardListView();
-  topListComponent = new NewCardListView(true, 'Top rated');
-  commentedListComponent = new NewCardListView(true, 'Most commented');
-  cardComponent = new NewCardListContainerView();
-  cardTopRatedComponent = new NewCardListContainerView();
-  cardCommentedComponent = new NewCardListContainerView();
+  #boardContainer = null;
+  #boardCards = null;
+  #boardCardsTop = null;
+  #boardCardsCommented = null;
+  #boardComments = null;
+  #movieModel = null;
+  #commentModel = null;
 
-  init = (boardContainer, movieModel, commentModel) => {
-    this.boardContainer = boardContainer;
-    this.movieModel = movieModel;
-    this.commentModel = commentModel;
-    this.boardCards  = [...this.movieModel.getData()];
-    this.boardComments  = [...this.commentModel.getData()];
+  #boardComponent = new NewBoardView();
+  #cardListComponent = new NewCardListView();
+  #topListComponent = new NewCardListView(true, 'Top rated');
+  #commentedListComponent = new NewCardListView(true, 'Most commented');
+  #cardComponent = new NewCardListContainerView();
+  #cardTopRatedComponent = new NewCardListContainerView();
+  #cardCommentedComponent = new NewCardListContainerView();
+  #showMoreButtonComponent = new NewButtonShowMoreView();
 
-    render(new NewSortView(), this.boardContainer);
-    render(this.boardComponent, this.boardContainer);
-    render(this.cardListComponent, this.boardComponent.getElement());
-    render(this.cardComponent, this.cardListComponent.getElement());
+  #renderedCardCount = COUNT_LIST_MOVIES;
+
+  constructor(boardContainer, movieModel, commentModel) {
+    this.#boardContainer = boardContainer;
+    this.#movieModel = movieModel;
+    this.#commentModel = commentModel;
+  }
+
+  init = () => {
+    this.#boardCards  = [...this.#movieModel.data];
+    this.#boardComments  = [...this.#commentModel.data];
+    this.#renderBoard();
+  };
+
+  #renderBoard = () => {
+    render(new NewSortView(), this.#boardContainer);
+    render(this.#boardComponent, this.#boardContainer);
+    render(this.#cardListComponent, this.#boardComponent.element);
+    render(this.#cardComponent, this.#cardListComponent.element);
 
     //Определение количества отображаемых карточек фильмов для основного блока.
-    const defaultListCount = Math.min(this.boardCards.length, COUNT_LIST_MOVIES);
+    const defaultListCount = Math.min(this.#boardCards.length, COUNT_LIST_MOVIES);
     //Определение количества отображаемых карточек фильмов для дополнительных блоков «Top rated movies» и «Most commented».
-    const additionalListCount = Math.min(this.boardCards.length, COUNT_LIST_ADDITIONAL);
+    const additionalListCount = Math.min(this.#boardCards.length, COUNT_LIST_ADDITIONAL);
 
-    for (let i = 0; i < defaultListCount; i++) {
-      render(new NewCardView(this.boardCards[i]), this.cardComponent.getElement());
+    if (this.#boardCards.length === 0) {
+      render(new NoCardView(), this.#cardComponent.element);
+    } else {
+      for (let i = 0; i < defaultListCount; i++) {
+        this.#renderCard(this.#boardCards[i], this.#cardComponent.element);
+      }
+
+      if (this.#boardCards.length > COUNT_LIST_MOVIES) {
+        render(this.#showMoreButtonComponent, this.#boardComponent.element);
+        this.#showMoreButtonComponent.element.addEventListener('click', this.#onLoadMoreButtonClick);
+      }
+
+      render(this.#topListComponent, this.#boardComponent.element);
+      render(this.#commentedListComponent, this.#boardComponent.element);
+      render(this.#cardTopRatedComponent, this.#topListComponent.element);
+      render(this.#cardCommentedComponent, this.#commentedListComponent.element);
+      for (let i = 0; i < additionalListCount; i++) {
+        this.#renderCard(this.#boardCards[i], this.#cardTopRatedComponent.element);
+        this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
+      }
     }
+  };
 
-    render(new NewButtonShowMoreView(), this.cardListComponent.getElement());
+  #renderCard = (card, elementComponent) => {
+    const cardComponent = new NewCardView(card);
+    const cardComments = this.#boardComments.filter((values) => card.comments.has(values.id));
+    const popupComponent = new NewPopupView(card, cardComments);
+    const bodyElement = document.querySelector('body');
 
-    render(this.topListComponent, this.boardComponent.getElement());
-    render(this.commentedListComponent, this.boardComponent.getElement());
-    render(this.cardTopRatedComponent, this.topListComponent.getElement());
-    render(this.cardCommentedComponent, this.commentedListComponent.getElement());
+    const addPopup = () => {
+      this.#boardContainer.appendChild(popupComponent.element);
+      bodyElement.classList.add('hide-overflow');
+    };
 
-    for (let i = 0; i < additionalListCount; i++) {
-      render(new NewCardView(this.boardCards[i]), this.cardTopRatedComponent.getElement());
+    const removePopup = () => {
+      this.#boardContainer.removeChild(popupComponent.element);
+      bodyElement.classList.remove('hide-overflow');
+    };
+
+    const onKeyDown = (evt) => {
+      if (onEscKeydown(evt)) {
+        evt.preventDefault();
+        removePopup();
+        document.removeEventListener('keydown', onKeyDown);
+      }
+    };
+
+    cardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
+      addPopup();
+      document.addEventListener('keydown', onKeyDown);
+    });
+
+    popupComponent.element.querySelector('.film-details__close-btn').addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      removePopup();
+      document.removeEventListener('keydown', onKeyDown);
+    });
+
+    popupComponent.element.querySelector('form').addEventListener('click', (evt) => {
+      evt.preventDefault();
+      removePopup();
+      document.removeEventListener('keydown', onKeyDown);
+    });
+
+    render(cardComponent, elementComponent);
+  };
+
+  #onLoadMoreButtonClick = (evt) => {
+    evt.preventDefault();
+    this.#boardCards
+      .slice(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES)
+      .forEach((card) => this.#renderCard(card, this.#cardComponent.element));
+
+    this.#renderedCardCount += COUNT_LIST_MOVIES;
+
+    if (this.#renderedCardCount >= this.#boardCards.length) {
+      this.#showMoreButtonComponent.element.remove();
+      this.#showMoreButtonComponent.removeElement();
     }
-
-    for (let i = 0; i < additionalListCount; i++) {
-      render(new NewCardView(this.boardCards[i]), this.cardCommentedComponent.getElement());
-    }
-
-    const firstCard = this.boardCards[0];
-    const cardComments = this.boardComments.filter((values) => firstCard.comments.includes(values.id));
-
-    render(new NewPopupView(firstCard, cardComments), this.boardContainer);
   };
 }

@@ -7,7 +7,7 @@ export default class NewCardListContainerView extends View {
     super();
   }
 
-  getTemplate() {
+  get template() {
     return createContaierTemplate();
   }
 }
