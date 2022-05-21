@@ -15,8 +15,6 @@ const COUNT_LIST_ADDITIONAL = 2;
 export default class BoardPresenter {
   #boardContainer = null;
   #boardCards = null;
-  #boardCardsTop = null;
-  #boardCardsCommented = null;
   #boardComments = null;
   #movieModel = null;
   #commentModel = null;
