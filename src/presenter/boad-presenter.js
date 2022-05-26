@@ -4,7 +4,7 @@ import NewCardView from '../view/card-view.js';
 import NewSortView from '../view/sort-view.js';
 import NewButtonShowMoreView from '../view/button-show-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
 import NoCardView from '../view/no-card-view.js';
 import {onEscKeydown} from '../utils.js';

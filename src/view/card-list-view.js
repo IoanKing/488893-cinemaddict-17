@@ -1,8 +1,8 @@
-import View from './view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createCardListTemplate = (isExtra, title) => `<section class="films-list ${(isExtra) ? 'films-list--extra': ''}"><h2 class="films-list__title ${(isExtra) ? '': 'visually-hidden'}">${title}</h2></section>`;
 
-export default class NewCardListView extends View  {
+export default class NewCardListView extends AbstractView  {
   #isExtra = false;
   #title = '';
 

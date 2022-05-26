@@ -2,7 +2,7 @@ import NewProffileView from './view/profile-view.js';
 import NewFilterView from './view/filter-view.js';
 import NewStatisticView from './view/statistics-view.js';
 import BoardPresenter from './presenter/boad-presenter.js';
-import {render} from './render.js';
+import {render} from './framework/render.js';
 import CardModel from './model/movie-models.js';
 import CommentModel from './model/comment-models.js';
 
