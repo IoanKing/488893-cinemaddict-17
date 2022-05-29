@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {getHumanReadableTime, getHumanReadableDate, getCommentDate} from '../utils.js';
+import {getHumanReadableTime, getHumanReadableDate, getCommentDate, onCtrlEnterKeydown} from '../utils.js';
 
 /**
  * Получение шаблона списка жанров для фильма.
@@ -186,4 +186,26 @@ export default class NewPopupView extends AbstractView {
   get template() {
     return createPopupTemplate(this.#data, this.#comments);
   }
+
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#submitFormHandler);
+  };
+
+  setCloseClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler);
+  };
+
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.closeClick();
+  };
+
+  #submitFormHandler = (evt) => {
+    if (onCtrlEnterKeydown(evt)) {
+      evt.preventDefault();
+      this._callback.formSubmit();
+    }
+  };
 }
