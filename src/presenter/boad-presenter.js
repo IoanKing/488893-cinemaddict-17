@@ -4,7 +4,7 @@ import NewCardView from '../view/card-view.js';
 import NewSortView from '../view/sort-view.js';
 import NewButtonShowMoreView from '../view/button-show-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
 import NoCardView from '../view/no-card-view.js';
 import {onEscKeydown} from '../utils.js';
@@ -62,7 +62,7 @@ export default class BoardPresenter {
 
       if (this.#boardCards.length > COUNT_LIST_MOVIES) {
         render(this.#showMoreButtonComponent, this.#boardComponent.element);
-        this.#showMoreButtonComponent.element.addEventListener('click', this.#onLoadMoreButtonClick);
+        this.#showMoreButtonComponent.setClickHandler(this.#onLoadMoreButtonClick);
       }
 
       render(this.#topListComponent, this.#boardComponent.element);
@@ -100,19 +100,17 @@ export default class BoardPresenter {
       }
     };
 
-    cardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
+    cardComponent.setEditClickHandler(() => {
       addPopup();
       document.addEventListener('keydown', onKeyDown);
     });
 
-    popupComponent.element.querySelector('.film-details__close-btn').addEventListener('submit', (evt) => {
-      evt.preventDefault();
+    popupComponent.setCloseClickHandler(() => {
       removePopup();
       document.removeEventListener('keydown', onKeyDown);
     });
 
-    popupComponent.element.querySelector('form').addEventListener('click', (evt) => {
-      evt.preventDefault();
+    popupComponent.setFormSubmitHandler(() => {
       removePopup();
       document.removeEventListener('keydown', onKeyDown);
     });
@@ -120,8 +118,7 @@ export default class BoardPresenter {
     render(cardComponent, elementComponent);
   };
 
-  #onLoadMoreButtonClick = (evt) => {
-    evt.preventDefault();
+  #onLoadMoreButtonClick = () => {
     this.#boardCards
       .slice(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES)
       .forEach((card) => this.#renderCard(card, this.#cardComponent.element));

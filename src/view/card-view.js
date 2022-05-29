@@ -1,4 +1,4 @@
-import View from './view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {getYearDate, getHumanReadableTime} from '../utils.js';
 
 const MAX_TEXT_LENGTH = 130;
@@ -54,7 +54,7 @@ const createCardTemplate = (data) => {
 };
 
 /** Класс карточки фильма. */
-export default class NewCardView extends View {
+export default class NewCardView extends AbstractView {
   #card = null;
 
   constructor(card) {
@@ -65,4 +65,14 @@ export default class NewCardView extends View {
   get template() {
     return createCardTemplate(this.#card);
   }
+
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#editClickHandler);
+  };
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 }

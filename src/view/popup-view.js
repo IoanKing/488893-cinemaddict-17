@@ -1,5 +1,5 @@
-import View from './view.js';
-import {getHumanReadableTime, getHumanReadableDate, getCommentDate} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {getHumanReadableTime, getHumanReadableDate, getCommentDate, onCtrlEnterKeydown} from '../utils.js';
 
 /**
  * Получение шаблона списка жанров для фильма.
@@ -173,7 +173,7 @@ const createPopupTemplate = (data, comments) => {
     </section>`;
 };
 
-export default class NewPopupView extends View {
+export default class NewPopupView extends AbstractView {
   #data = null;
   #comments = null;
 
@@ -186,4 +186,26 @@ export default class NewPopupView extends View {
   get template() {
     return createPopupTemplate(this.#data, this.#comments);
   }
+
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#submitFormHandler);
+  };
+
+  setCloseClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler);
+  };
+
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.closeClick();
+  };
+
+  #submitFormHandler = (evt) => {
+    if (onCtrlEnterKeydown(evt)) {
+      evt.preventDefault();
+      this._callback.formSubmit();
+    }
+  };
 }
