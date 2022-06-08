@@ -4,7 +4,7 @@ import NewCardView from '../view/card-view.js';
 import NewSortView from '../view/sort-view.js';
 import NewButtonShowMoreView from '../view/button-show-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
-import {render} from '../framework/render.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
 import NoCardView from '../view/no-card-view.js';
 import {onEscKeydown} from '../utils.js';
@@ -14,18 +14,23 @@ const COUNT_LIST_ADDITIONAL = 2;
 
 export default class BoardPresenter {
   #boardContainer = null;
-  #boardCards = null;
+  #boardCards = [];
   #boardComments = null;
   #movieModel = null;
   #commentModel = null;
 
+  #sortComponent = new NewSortView();
+  #noCardComponent = new NoCardView();
   #boardComponent = new NewBoardView();
   #cardListComponent = new NewCardListView();
+
   #topListComponent = new NewCardListView(true, 'Top rated');
   #commentedListComponent = new NewCardListView(true, 'Most commented');
+
   #cardComponent = new NewCardListContainerView();
   #cardTopRatedComponent = new NewCardListContainerView();
   #cardCommentedComponent = new NewCardListContainerView();
+
   #showMoreButtonComponent = new NewButtonShowMoreView();
 
   #renderedCardCount = COUNT_LIST_MOVIES;
@@ -42,38 +47,56 @@ export default class BoardPresenter {
     this.#renderBoard();
   };
 
-  #renderBoard = () => {
-    render(new NewSortView(), this.#boardContainer);
-    render(this.#boardComponent, this.#boardContainer);
-    render(this.#cardListComponent, this.#boardComponent.element);
-    render(this.#cardComponent, this.#cardListComponent.element);
+  #renderSort = () => {
+    render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
+  };
 
-    //Определение количества отображаемых карточек фильмов для основного блока.
-    const defaultListCount = Math.min(this.#boardCards.length, COUNT_LIST_MOVIES);
-    //Определение количества отображаемых карточек фильмов для дополнительных блоков «Top rated movies» и «Most commented».
-    const additionalListCount = Math.min(this.#boardCards.length, COUNT_LIST_ADDITIONAL);
+  #renderNoCard = () => {
+    render(this.#noCardComponent, this.#cardComponent.element);
+  };
+
+  #renderBoard = () => {
+    render(this.#boardComponent, this.#boardContainer);
+    this.#renderCardList();
+    this.#renderCardBlock();
+    this.#renderSort();
 
     if (this.#boardCards.length === 0) {
-      render(new NoCardView(), this.#cardComponent.element);
-    } else {
-      for (let i = 0; i < defaultListCount; i++) {
-        this.#renderCard(this.#boardCards[i], this.#cardComponent.element);
-      }
-
-      if (this.#boardCards.length > COUNT_LIST_MOVIES) {
-        render(this.#showMoreButtonComponent, this.#boardComponent.element);
-        this.#showMoreButtonComponent.setClickHandler(this.#onLoadMoreButtonClick);
-      }
-
-      render(this.#topListComponent, this.#boardComponent.element);
-      render(this.#commentedListComponent, this.#boardComponent.element);
-      render(this.#cardTopRatedComponent, this.#topListComponent.element);
-      render(this.#cardCommentedComponent, this.#commentedListComponent.element);
-      for (let i = 0; i < additionalListCount; i++) {
-        this.#renderCard(this.#boardCards[i], this.#cardTopRatedComponent.element);
-        this.#renderCard(this.#boardCards[i], this.#cardCommentedComponent.element);
-      }
+      this.#renderNoCard();
+      return;
     }
+
+    this.#renderCardsList();
+    this.#renderCardsTopList();
+    this.#renderCardsCommentedList();
+  };
+
+  #renderCardList = () => {
+    render(this.#cardListComponent, this.#boardComponent.element);
+  };
+
+  #renderCardBlock = () => {
+    render(this.#cardComponent, this.#cardListComponent.element);
+  };
+
+  #renderCardsList = () => {
+    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES, this.#cardComponent.element);
+
+    if (this.#boardCards.length > COUNT_LIST_MOVIES) {
+      this.#renderLoadMoreButton();
+    }
+  };
+
+  #renderCardsTopList = () => {
+    render(this.#topListComponent, this.#boardComponent.element);
+    render(this.#cardTopRatedComponent, this.#topListComponent.element);
+    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_ADDITIONAL, this.#cardTopRatedComponent.element);
+  };
+
+  #renderCardsCommentedList = () => {
+    render(this.#commentedListComponent, this.#boardComponent.element);
+    render(this.#cardCommentedComponent, this.#commentedListComponent.element);
+    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_ADDITIONAL, this.#cardCommentedComponent.element);
   };
 
   #renderCard = (card, elementComponent) => {
@@ -118,16 +141,24 @@ export default class BoardPresenter {
     render(cardComponent, elementComponent);
   };
 
-  #onLoadMoreButtonClick = () => {
+  #renderCards = (from, to, component) => {
     this.#boardCards
-      .slice(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES)
-      .forEach((card) => this.#renderCard(card, this.#cardComponent.element));
+      .slice(from, to)
+      .forEach((card) => this.#renderCard(card, component));
+  };
+
+  #renderLoadMoreButton = () => {
+    render(this.#showMoreButtonComponent, this.#boardComponent.element);
+    this.#showMoreButtonComponent.setClickHandler(this.#onLoadMoreButtonClick);
+  };
+
+  #onLoadMoreButtonClick = () => {
+    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES, this.#cardComponent.element);
 
     this.#renderedCardCount += COUNT_LIST_MOVIES;
 
     if (this.#renderedCardCount >= this.#boardCards.length) {
-      this.#showMoreButtonComponent.element.remove();
-      this.#showMoreButtonComponent.removeElement();
+      remove(this.#showMoreButtonComponent);
     }
   };
 }
