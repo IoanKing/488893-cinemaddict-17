@@ -1,13 +1,11 @@
 import NewBoardView from '../view/board-view.js';
 import NewCardListView from '../view/card-list-view.js';
-import NewCardView from '../view/card-view.js';
 import NewSortView from '../view/sort-view.js';
 import NewButtonShowMoreView from '../view/button-show-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
 import {render, RenderPosition, remove} from '../framework/render.js';
-import NewPopupView from '../view/popup-view.js';
 import NoCardView from '../view/no-card-view.js';
-import {onEscKeydown} from '../utils.js';
+import CardPresenter from './card-presenter.js';
 
 const COUNT_LIST_MOVIES = 5;
 const COUNT_LIST_ADDITIONAL = 2;
@@ -15,7 +13,7 @@ const COUNT_LIST_ADDITIONAL = 2;
 export default class BoardPresenter {
   #boardContainer = null;
   #boardCards = [];
-  #boardComments = null;
+  #boardComments = [];
   #movieModel = null;
   #commentModel = null;
 
@@ -47,17 +45,9 @@ export default class BoardPresenter {
     this.#renderBoard();
   };
 
-  #renderSort = () => {
-    render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
-  };
-
-  #renderNoCard = () => {
-    render(this.#noCardComponent, this.#cardComponent.element);
-  };
-
   #renderBoard = () => {
     render(this.#boardComponent, this.#boardContainer);
-    this.#renderCardList();
+    this.#renderCardListBlock();
     this.#renderCardBlock();
     this.#renderSort();
 
@@ -71,7 +61,15 @@ export default class BoardPresenter {
     this.#renderCardsCommentedList();
   };
 
-  #renderCardList = () => {
+  #renderSort = () => {
+    render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
+  };
+
+  #renderNoCard = () => {
+    render(this.#noCardComponent, this.#cardComponent.element);
+  };
+
+  #renderCardListBlock = () => {
     render(this.#cardListComponent, this.#boardComponent.element);
   };
 
@@ -99,52 +97,16 @@ export default class BoardPresenter {
     this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_ADDITIONAL, this.#cardCommentedComponent.element);
   };
 
-  #renderCard = (card, elementComponent) => {
-    const cardComponent = new NewCardView(card);
-    const cardComments = this.#boardComments.filter((values) => card.comments.has(values.id));
-    const popupComponent = new NewPopupView(card, cardComments);
-    const bodyElement = document.querySelector('body');
+  #renderCard = (card, elementComponent, comments) => {
+    const cardPresenter = new CardPresenter(elementComponent);
 
-    const addPopup = () => {
-      this.#boardContainer.appendChild(popupComponent.element);
-      bodyElement.classList.add('hide-overflow');
-    };
-
-    const removePopup = () => {
-      this.#boardContainer.removeChild(popupComponent.element);
-      bodyElement.classList.remove('hide-overflow');
-    };
-
-    const onKeyDown = (evt) => {
-      if (onEscKeydown(evt)) {
-        evt.preventDefault();
-        removePopup();
-        document.removeEventListener('keydown', onKeyDown);
-      }
-    };
-
-    cardComponent.setEditClickHandler(() => {
-      addPopup();
-      document.addEventListener('keydown', onKeyDown);
-    });
-
-    popupComponent.setCloseClickHandler(() => {
-      removePopup();
-      document.removeEventListener('keydown', onKeyDown);
-    });
-
-    popupComponent.setFormSubmitHandler(() => {
-      removePopup();
-      document.removeEventListener('keydown', onKeyDown);
-    });
-
-    render(cardComponent, elementComponent);
+    cardPresenter.init(card, comments);
   };
 
-  #renderCards = (from, to, component) => {
+  #renderCards = (from, to, elementComponent) => {
     this.#boardCards
       .slice(from, to)
-      .forEach((card) => this.#renderCard(card, component));
+      .forEach((card) => this.#renderCard(card, elementComponent, this.#boardComments));
   };
 
   #renderLoadMoreButton = () => {
