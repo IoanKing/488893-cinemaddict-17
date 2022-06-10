@@ -7,9 +7,13 @@ export default class CardPresenter {
   #comments = null;
   #card = null;
   #cardComponent = null;
+  #changeData = null;
 
-  constructor(cardListContainer) {
+  #bodyComponent = document.querySelector('body');
+
+  constructor(cardListContainer, changeData) {
     this.#cardListContainer = cardListContainer;
+    this.#changeData = changeData;
   }
 
   init = (card, comments) => {
@@ -19,10 +23,11 @@ export default class CardPresenter {
     const prevCardComponent = this.#cardComponent;
 
     this.#cardComponent = new NewCardView(this.#card);
-    this.#cardComponent.setEditClickHandler(this.#onEditClick);
 
     if (prevCardComponent === null) {
       render(this.#cardComponent, this.#cardListContainer);
+      this.#cardComponent.setEditClickHandler(this.#onEditClick);
+      this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
       return;
     }
 
@@ -39,7 +44,11 @@ export default class CardPresenter {
 
   #onEditClick = () => {
     const cardComments = this.#comments.filter((values) => this.#card.comments.has(values.id));
-    const popupPresenter = new PopupPresenter();
+    const popupPresenter = new PopupPresenter(this.#bodyComponent);
     popupPresenter.init(this.#card, cardComments);
+  };
+
+  #onWathlistClick = () => {
+    this.#changeData({...this.#card.userDetails, watchlist: !this.#card.userDetails.watchlist});
   };
 }

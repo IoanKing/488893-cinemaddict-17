@@ -6,6 +6,7 @@ import NewCardListContainerView from '../view/card-list-container-view.js';
 import {render, RenderPosition, remove} from '../framework/render.js';
 import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
+import {updateItem} from '../utils.js';
 
 const COUNT_LIST_MOVIES = 5;
 const COUNT_LIST_ADDITIONAL = 2;
@@ -82,7 +83,7 @@ export default class BoardPresenter {
     this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES, this.#cardComponent.element);
 
     if (this.#boardCards.length > COUNT_LIST_MOVIES) {
-      this.#renderLoadMoreButton();
+      this.#renderShowMoreButton();
     }
   };
 
@@ -91,6 +92,11 @@ export default class BoardPresenter {
     this.#cardPresenter.clear();
     this.#renderedCardCount = COUNT_LIST_MOVIES;
     remove(this.#showMoreButtonComponent);
+  };
+
+  #onTaskChange = (updatedTask) => {
+    this.#boardCards = updateItem(this.#boardCards, updatedTask);
+    this.#cardPresenter.get(updatedTask.id).init(updatedTask);
   };
 
   #renderCardsTopList = () => {
@@ -106,7 +112,7 @@ export default class BoardPresenter {
   };
 
   #renderCard = (card, elementComponent, comments) => {
-    const cardPresenter = new CardPresenter(elementComponent);
+    const cardPresenter = new CardPresenter(elementComponent, this.#onTaskChange);
 
     cardPresenter.init(card, comments);
 
@@ -119,12 +125,12 @@ export default class BoardPresenter {
       .forEach((card) => this.#renderCard(card, elementComponent, this.#boardComments));
   };
 
-  #renderLoadMoreButton = () => {
+  #renderShowMoreButton = () => {
     render(this.#showMoreButtonComponent, this.#boardComponent.element);
-    this.#showMoreButtonComponent.setClickHandler(this.#onLoadMoreButtonClick);
+    this.#showMoreButtonComponent.setClickHandler(this.#onShowMoreButtonClick);
   };
 
-  #onLoadMoreButtonClick = () => {
+  #onShowMoreButtonClick = () => {
     this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES, this.#cardComponent.element);
 
     this.#renderedCardCount += COUNT_LIST_MOVIES;
