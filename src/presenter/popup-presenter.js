@@ -1,4 +1,4 @@
-import {render, remove} from '../framework/render.js';
+import {render, remove, replace} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
 import {onEscKeydown} from '../utils.js';
 
@@ -9,16 +9,33 @@ export default class PopupPresenter {
   #elementComponent = document.querySelector('body');
   #popupComponent = null;
 
-  constructor(card, comments) {
-    this.#card = card;
-    this.#comments = comments;
+  constructor() {
   }
 
-  init = () => {
+  init = (card, comments) => {
+    this.#card = card;
+    this.#comments = comments;
+
+    const prevPopupComponent = this.#popupComponent;
+
     this.#popupComponent = new NewPopupView(this.#card, this.#comments);
     this.#popupComponent.setCloseClickHandler(this.#onCloseClick);
     this.#popupComponent.setFormSubmitHandler(this.#onCloseClick);
-    this.#addPopup();
+
+    if (prevPopupComponent === null) {
+      this.#addPopup();
+      return;
+    }
+
+    if (this.#elementComponent.contains(prevPopupComponent.element)) {
+      replace(this.#elementComponent, prevPopupComponent);
+    }
+
+    remove(prevPopupComponent);
+  };
+
+  destroy = () => {
+    remove(this.#popupComponent);
   };
 
   #addPopup = () => {

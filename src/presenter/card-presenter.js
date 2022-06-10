@@ -1,5 +1,5 @@
 import NewCardView from '../view/card-view.js';
-import {render} from '../framework/render.js';
+import {render, replace, remove} from '../framework/render.js';
 import PopupPresenter from './popup-presenter.js';
 
 export default class CardPresenter {
@@ -16,15 +16,30 @@ export default class CardPresenter {
     this.#card = card;
     this.#comments = comments;
 
+    const prevCardComponent = this.#cardComponent;
+
     this.#cardComponent = new NewCardView(this.#card);
     this.#cardComponent.setEditClickHandler(this.#onEditClick);
 
-    render(this.#cardComponent, this.#cardListContainer);
+    if (prevCardComponent === null) {
+      render(this.#cardComponent, this.#cardListContainer);
+      return;
+    }
+
+    if (this.#cardListContainer.contains(prevCardComponent.element)) {
+      replace(this.#cardComponent, prevCardComponent);
+    }
+
+    remove(prevCardComponent);
+  };
+
+  destroy = () => {
+    remove(this.#cardComponent);
   };
 
   #onEditClick = () => {
     const cardComments = this.#comments.filter((values) => this.#card.comments.has(values.id));
-    const popupPresenter = new PopupPresenter(this.#card, cardComments);
-    popupPresenter.init();
+    const popupPresenter = new PopupPresenter();
+    popupPresenter.init(this.#card, cardComments);
   };
 }
