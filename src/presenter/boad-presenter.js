@@ -14,6 +14,7 @@ export default class BoardPresenter {
   #boardContainer = null;
   #boardCards = [];
   #boardComments = [];
+  #cardPresenter = new Map();
   #movieModel = null;
   #commentModel = null;
 
@@ -85,6 +86,13 @@ export default class BoardPresenter {
     }
   };
 
+  #clearCardsList = () => {
+    this.#cardPresenter.forEach((presenter) => presenter.destroy());
+    this.#cardPresenter.clear();
+    this.#renderedCardCount = COUNT_LIST_MOVIES;
+    remove(this.#showMoreButtonComponent);
+  };
+
   #renderCardsTopList = () => {
     render(this.#topListComponent, this.#boardComponent.element);
     render(this.#cardTopRatedComponent, this.#topListComponent.element);
@@ -101,6 +109,8 @@ export default class BoardPresenter {
     const cardPresenter = new CardPresenter(elementComponent);
 
     cardPresenter.init(card, comments);
+
+    this.#cardPresenter.set(card.id, cardPresenter);
   };
 
   #renderCards = (from, to, elementComponent) => {
