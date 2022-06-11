@@ -17,6 +17,7 @@ export default class BoardPresenter {
   #boardCards = [];
   #boardComments = [];
   #cardPresenter = new Map();
+  #popupPresentor = null;
   #movieModel = null;
   #commentModel = null;
 
@@ -126,8 +127,13 @@ export default class BoardPresenter {
   };
 
   #renderPopup = (card, comments) => {
+    if (this.#popupPresentor !== null) {
+      this.#popupPresentor.destroy();
+    }
     const popupPresenter = new PopupPresenter(this.#bodyComponent);
     popupPresenter.init(card, comments);
+
+    this.#popupPresentor = popupPresenter;
   };
 
   #renderCards = (from, to, elementComponent) => {
