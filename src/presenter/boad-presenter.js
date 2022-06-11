@@ -1,12 +1,12 @@
 import NewBoardView from '../view/board-view.js';
 import NewCardListView from '../view/card-list-view.js';
 import NewSortView from '../view/sort-view.js';
-import NewButtonShowMoreView from '../view/button-show-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
-import {render, RenderPosition, remove} from '../framework/render.js';
+import {render, RenderPosition} from '../framework/render.js';
 import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {updateItem} from '../utils.js';
+import ShowButtonPresenter from './showbutton-presenter.js';
 
 const COUNT_LIST_MOVIES = 5;
 const COUNT_LIST_ADDITIONAL = 2;
@@ -31,8 +31,7 @@ export default class BoardPresenter {
   #cardTopRatedComponent = new NewCardListContainerView();
   #cardCommentedComponent = new NewCardListContainerView();
 
-  #showMoreButtonComponent = new NewButtonShowMoreView();
-
+  #showMoreButtonComponent = null;
   #renderedCardCount = COUNT_LIST_MOVIES;
 
   constructor(boardContainer, movieModel, commentModel) {
@@ -44,6 +43,9 @@ export default class BoardPresenter {
   init = () => {
     this.#boardCards  = [...this.#movieModel.data];
     this.#boardComments  = [...this.#commentModel.data];
+
+    this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
+
     this.#renderBoard();
   };
 
@@ -91,7 +93,7 @@ export default class BoardPresenter {
     this.#cardPresenter.forEach((presenter) => presenter.destroy());
     this.#cardPresenter.clear();
     this.#renderedCardCount = COUNT_LIST_MOVIES;
-    remove(this.#showMoreButtonComponent);
+    this.#showMoreButtonComponent.destroy();
   };
 
   #onTaskChange = (updatedTask) => {
@@ -126,8 +128,7 @@ export default class BoardPresenter {
   };
 
   #renderShowMoreButton = () => {
-    render(this.#showMoreButtonComponent, this.#boardComponent.element);
-    this.#showMoreButtonComponent.setClickHandler(this.#onShowMoreButtonClick);
+    this.#showMoreButtonComponent.init(this.#onShowMoreButtonClick);
   };
 
   #onShowMoreButtonClick = () => {
@@ -136,7 +137,7 @@ export default class BoardPresenter {
     this.#renderedCardCount += COUNT_LIST_MOVIES;
 
     if (this.#renderedCardCount >= this.#boardCards.length) {
-      remove(this.#showMoreButtonComponent);
+      this.#showMoreButtonComponent.destroy();
     }
   };
 }
