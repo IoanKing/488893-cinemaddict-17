@@ -7,6 +7,7 @@ import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {updateItem} from '../utils.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
+import PopupPresenter from './popup-presenter.js';
 
 const COUNT_LIST_MOVIES = 5;
 const COUNT_LIST_ADDITIONAL = 2;
@@ -33,6 +34,8 @@ export default class BoardPresenter {
 
   #showMoreButtonComponent = null;
   #renderedCardCount = COUNT_LIST_MOVIES;
+
+  #bodyComponent = document.querySelector('body');
 
   constructor(boardContainer, movieModel, commentModel) {
     this.#boardContainer = boardContainer;
@@ -117,8 +120,14 @@ export default class BoardPresenter {
     const cardPresenter = new CardPresenter(elementComponent, this.#onTaskChange);
 
     cardPresenter.init(card, comments);
+    cardPresenter.setClickHandler(this.#renderPopup);
 
     this.#cardPresenter.set(card.id, cardPresenter);
+  };
+
+  #renderPopup = (card, comments) => {
+    const popupPresenter = new PopupPresenter(this.#bodyComponent);
+    popupPresenter.init(card, comments);
   };
 
   #renderCards = (from, to, elementComponent) => {

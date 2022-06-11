@@ -1,6 +1,5 @@
 import NewCardView from '../view/card-view.js';
 import {render, replace, remove} from '../framework/render.js';
-import PopupPresenter from './popup-presenter.js';
 
 export default class CardPresenter {
   #cardListContainer = null;
@@ -8,8 +7,8 @@ export default class CardPresenter {
   #card = null;
   #cardComponent = null;
   #changeData = null;
-
-  #bodyComponent = document.querySelector('body');
+  #cardComments = null;
+  _callback = {};
 
   constructor(cardListContainer, changeData) {
     this.#cardListContainer = cardListContainer;
@@ -20,13 +19,14 @@ export default class CardPresenter {
     this.#card = card;
     this.#comments = comments;
 
+    this.#cardComments = this.#comments.filter((values) => this.#card.comments.has(values.id));
+
     const prevCardComponent = this.#cardComponent;
 
     this.#cardComponent = new NewCardView(this.#card);
 
     if (prevCardComponent === null) {
       render(this.#cardComponent, this.#cardListContainer);
-      this.#cardComponent.setEditClickHandler(this.#onEditClick);
       this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
       return;
     }
@@ -38,14 +38,17 @@ export default class CardPresenter {
     remove(prevCardComponent);
   };
 
-  destroy = () => {
-    remove(this.#cardComponent);
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.#cardComponent.setEditClickHandler(this.#popupClickHandler);
   };
 
-  #onEditClick = () => {
-    const cardComments = this.#comments.filter((values) => this.#card.comments.has(values.id));
-    const popupPresenter = new PopupPresenter(this.#bodyComponent);
-    popupPresenter.init(this.#card, cardComments);
+  #popupClickHandler = () => {
+    this._callback.click(this.#card, this.#cardComments);
+  };
+
+  destroy = () => {
+    remove(this.#cardComponent);
   };
 
   #onWathlistClick = () => {
