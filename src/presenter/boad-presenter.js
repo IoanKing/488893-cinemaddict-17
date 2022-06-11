@@ -100,11 +100,6 @@ export default class BoardPresenter {
     this.#showMoreButtonComponent.destroy();
   };
 
-  #onTaskChange = (updatedTask) => {
-    this.#boardCards = updateItem(this.#boardCards, updatedTask);
-    this.#cardPresenter.get(updatedTask.id).init(updatedTask);
-  };
-
   #renderCardsTopList = () => {
     render(this.#topListComponent, this.#boardComponent.element);
     render(this.#cardTopRatedComponent, this.#topListComponent.element);
@@ -124,6 +119,11 @@ export default class BoardPresenter {
     cardPresenter.setClickHandler(this.#renderPopup);
 
     this.#cardPresenter.set(card.id, cardPresenter);
+  };
+
+  #onTaskChange = (updatedCard) => {
+    this.#boardCards = updateItem(this.#boardCards, updatedCard);
+    this.#cardPresenter.get(updatedCard.id).init(updatedCard, this.#boardComments);
   };
 
   #renderPopup = (card, comments) => {

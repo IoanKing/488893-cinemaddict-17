@@ -52,6 +52,6 @@ export default class CardPresenter {
   };
 
   #onWathlistClick = () => {
-    this.#changeData({...this.#card.userDetails, watchlist: !this.#card.userDetails.watchlist});
+    this.#changeData({...this.#card, watchlist: !this.#card.userDetails.watchlist});
   };
 }
