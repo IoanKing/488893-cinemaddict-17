@@ -96,7 +96,7 @@ export default class CardPresenter {
       ...this.#card.userDetails,
       watchlist: !this.#card.userDetails.watchlist
     }});
-    this.#popupPresentor.init(this.#card, this.#comments);
+    this.#reRenderPopup();
   };
 
   #onFavoriteClick = () => {
@@ -104,7 +104,7 @@ export default class CardPresenter {
       ...this.#card.userDetails,
       favorite: !this.#card.userDetails.favorite
     }});
-    this.#popupPresentor.init(this.#card, this.#comments);
+    this.#reRenderPopup();
   };
 
   #onWatchedClick = () => {
@@ -113,6 +113,12 @@ export default class CardPresenter {
       isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
       watchingDate: new Date().toUTCString(),
     }});
-    this.#popupPresentor.init(this.#card, this.#comments);
+    this.#reRenderPopup();
+  };
+
+  #reRenderPopup = () => {
+    if (this.#popupPresentor !== null) {
+      this.#popupPresentor.init(this.#card, this.#comments);
+    }
   };
 }

@@ -72,17 +72,29 @@ export default class NewCardView extends AbstractView {
 
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
-    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#watchlistClickHandler);
+    this.element
+      .querySelector('.film-card__controls-item--add-to-watchlist')
+      .addEventListener('click', (evt) => {
+        this.#cardControlClickHandler(evt, this._callback.watchlistClick);
+      });
   };
 
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
+    this.element
+      .querySelector('.film-card__controls-item--favorite')
+      .addEventListener('click', (evt) => {
+        this.#cardControlClickHandler(evt, this._callback.favoriteClick);
+      });
   };
 
   setWatchedClickHandler = (callback) => {
     this._callback.watchedClick = callback;
-    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#wathcedClickHandler);
+    this.element
+      .querySelector('.film-card__controls-item--mark-as-watched')
+      .addEventListener('click', (evt) => {
+        this.#cardControlClickHandler(evt, this._callback.watchedClick);
+      });
   };
 
   #editClickHandler = (evt) => {
@@ -90,18 +102,8 @@ export default class NewCardView extends AbstractView {
     this._callback.editClick();
   };
 
-  #watchlistClickHandler = (evt) => {
+  #cardControlClickHandler = (evt, callback) => {
     evt.preventDefault();
-    this._callback.watchlistClick();
-  };
-
-  #favoriteClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.favoriteClick();
-  };
-
-  #wathcedClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.watchedClick();
+    callback();
   };
 }

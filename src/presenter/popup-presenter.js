@@ -46,9 +46,9 @@ export default class PopupPresenter {
 
   #setHandlers = () => {
     this.#popupComponent.setCloseClickHandler(this.#onCloseClick);
-    this.#popupComponent.setWatchlistClickHandler(this.#onWathlistClick);
-    this.#popupComponent.setFavoriteClickHandler(this.#onFavoriteClick);
-    this.#popupComponent.setWatchedClickHandler(this.#onWatchedClick);
+    this.#popupComponent.setWatchlistClickHandler(() => this.#onCardControlClick('watchlist'));
+    this.#popupComponent.setFavoriteClickHandler(() => this.#onCardControlClick('favorite'));
+    this.#popupComponent.setWatchedClickHandler(() => this.#onCardControlClick('watched'));
   };
 
   #addPopup = () => {
@@ -74,15 +74,7 @@ export default class PopupPresenter {
     this.#removePopup();
   };
 
-  #onWathlistClick = () => {
-    this.#changeData('watchlist');
-  };
-
-  #onFavoriteClick = () => {
-    this.#changeData('favorite');
-  };
-
-  #onWatchedClick = () => {
-    this.#changeData('watched');
+  #onCardControlClick = (listName) => {
+    this.#changeData(listName);
   };
 }
