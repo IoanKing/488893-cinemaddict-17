@@ -65,15 +65,15 @@ export default class BoardPresenter {
     this.#filterPresenter.init(this.#boardCards);
   };
 
-  #handleSortTypeChange = (sortType) => {
-    // - Сортируем задачи
-    // - Очищаем список
-    // - Рендерим список заново
-  };
+  // #handleSortTypeChange = (sortType) => {
+  //   // - Сортируем задачи
+  //   // - Очищаем список
+  //   // - Рендерим список заново
+  // };
 
   #renderSort = () => {
     render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
-    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    // this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #renderNoCard = () => {
