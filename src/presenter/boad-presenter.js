@@ -37,7 +37,7 @@ export default class BoardPresenter {
   // #cardCommentedComponent = new NewCardListContainerView();
 
   #showMoreButtonComponent = null;
-  #renderedCardCount = COUNT_LIST_MOVIES;
+  #renderedCardCount = 0;
 
   #bodyComponent = document.querySelector('body');
 
@@ -96,6 +96,8 @@ export default class BoardPresenter {
 
   #renderCardsList = () => {
     this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES, this.#cardComponent.element);
+
+    this.#renderedCardCount += COUNT_LIST_MOVIES;
 
     if (this.#boardCards.length > COUNT_LIST_MOVIES) {
       this.#renderShowMoreButton();
