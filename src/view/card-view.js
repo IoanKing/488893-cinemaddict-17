@@ -1,14 +1,13 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {getYearDate, getHumanReadableTime} from '../utils.js';
-
-const MAX_TEXT_LENGTH = 130;
+import {Setting} from '../const.js';
 
 /**
  * Обрезка текста более заданого количества символов.
  * @param {string} text - Исходный текст.
  * @returns - Обрезанный текст.
  */
-const getDescriptionShort = (text) => `${text.substring(0, MAX_TEXT_LENGTH)}${(text.length > MAX_TEXT_LENGTH) ? '...' : ''} `;
+const getDescriptionShort = (text) => `${text.substring(0, Setting.MAX_TEXT_LENGTH)}${(text.length > Setting.MAX_TEXT_LENGTH) ? '...' : ''} `;
 
 /**
  * Получение шаблона карточки фильма.

@@ -8,9 +8,7 @@ import CardPresenter from './card-presenter.js';
 import {updateItem} from '../utils.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
 import FilterPresenter from './filter-presenter.js';
-
-const COUNT_LIST_MOVIES = 5;
-// const COUNT_LIST_ADDITIONAL = 2;
+import {Setting} from '../const.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -84,11 +82,11 @@ export default class BoardPresenter {
   };
 
   #renderCardsList = () => {
-    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES, this.#cardComponent.element);
+    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + Setting.COUNT_LIST_MOVIES, this.#cardComponent.element);
 
-    this.#renderedCardCount += COUNT_LIST_MOVIES;
+    this.#renderedCardCount += Setting.COUNT_LIST_MOVIES;
 
-    if (this.#boardCards.length > COUNT_LIST_MOVIES) {
+    if (this.#boardCards.length > Setting.COUNT_LIST_MOVIES) {
       this.#renderShowMoreButton();
     }
   };
@@ -96,7 +94,7 @@ export default class BoardPresenter {
   #clearCardsList = () => {
     this.#cardPresenter.forEach((presenter) => presenter.destroy());
     this.#cardPresenter.clear();
-    this.#renderedCardCount = COUNT_LIST_MOVIES;
+    this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
     this.#showMoreButtonComponent.destroy();
   };
 
@@ -129,9 +127,9 @@ export default class BoardPresenter {
   };
 
   #onShowMoreButtonClick = () => {
-    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_MOVIES, this.#cardComponent.element);
+    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + Setting.COUNT_LIST_MOVIES, this.#cardComponent.element);
 
-    this.#renderedCardCount += COUNT_LIST_MOVIES;
+    this.#renderedCardCount += Setting.COUNT_LIST_MOVIES;
 
     if (this.#renderedCardCount >= this.#boardCards.length) {
       this.#showMoreButtonComponent.destroy();
