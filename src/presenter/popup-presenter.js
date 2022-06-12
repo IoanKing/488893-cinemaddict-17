@@ -75,24 +75,14 @@ export default class PopupPresenter {
   };
 
   #onWathlistClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      watchlist: !this.#card.userDetails.watchlist
-    }});
+    this.#changeData('watchlist');
   };
 
   #onFavoriteClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      favorite: !this.#card.userDetails.favorite
-    }});
+    this.#changeData('favorite');
   };
 
   #onWatchedClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
-      watchingDate: Date.now(),
-    }});
+    this.#changeData('watched');
   };
 }
