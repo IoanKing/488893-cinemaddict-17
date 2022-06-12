@@ -1,5 +1,8 @@
 import NewCardView from '../view/card-view.js';
 import {render, replace, remove} from '../framework/render.js';
+import PopupPresenter from './popup-presenter.js';
+
+const bodyComponent = document.querySelector('body');
 
 export default class CardPresenter {
   #cardListContainer = null;
@@ -7,19 +10,20 @@ export default class CardPresenter {
   #card = null;
   #cardComponent = null;
   #changeData = null;
-  #cardComments = null;
   _callback = {};
 
-  constructor(cardListContainer, changeData) {
+  #popupPresentor = null;
+  #onPopupOpen = false;
+
+  constructor(cardListContainer, changeData, onPopupOpen) {
     this.#cardListContainer = cardListContainer;
     this.#changeData = changeData;
+    this.#onPopupOpen = onPopupOpen;
   }
 
   init = (card, comments) => {
     this.#card = card;
-    this.#comments = comments;
-
-    this.#cardComments = this.#comments.filter((values) => this.#card.comments.has(values.id));
+    this.#comments = comments.filter((values) => this.#card.comments.has(values.id));
 
     const prevCardComponent = this.#cardComponent;
 
@@ -27,17 +31,13 @@ export default class CardPresenter {
 
     if (prevCardComponent === null) {
       render(this.#cardComponent, this.#cardListContainer);
-      this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
-      this.#cardComponent.setFavoriteClickHandler(this.#onFavoriteClick);
-      this.#cardComponent.setWatchedClickHandler(this.#onWatchedClick);
+      this.#setHandlers();
       return;
     }
 
     if (this.#cardListContainer.contains(prevCardComponent.element)) {
       replace(this.#cardComponent, prevCardComponent);
-      this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
-      this.#cardComponent.setFavoriteClickHandler(this.#onFavoriteClick);
-      this.#cardComponent.setWatchedClickHandler(this.#onWatchedClick);
+      this.#setHandlers();
     }
 
     remove(prevCardComponent);
@@ -47,17 +47,38 @@ export default class CardPresenter {
     return this.#card;
   }
 
-  setClickHandler = (callback) => {
-    this._callback.click = callback;
+  get comments() {
+    return this.#comments;
+  }
+
+  #setHandlers = () => {
     this.#cardComponent.setEditClickHandler(this.#popupClickHandler);
+    this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
+    this.#cardComponent.setFavoriteClickHandler(this.#onFavoriteClick);
+    this.#cardComponent.setWatchedClickHandler(this.#onWatchedClick);
   };
 
   #popupClickHandler = () => {
-    this._callback.click(this.#card, this.#cardComments);
+    this.#renderPopup(this.#card, this.#comments);
+  };
+
+  resetPopup = () => {
+    if (this.#popupPresentor !== null) {
+      this.#popupPresentor.destroy();
+      this.#popupPresentor = null;
+    }
   };
 
   destroy = () => {
     remove(this.#cardComponent);
+  };
+
+  #renderPopup = (card, comments) => {
+    this.#onPopupOpen();
+    const popupPresenter = new PopupPresenter(bodyComponent, this.#changeData);
+    popupPresenter.init(card, comments);
+
+    this.#popupPresentor = popupPresenter;
   };
 
   #onWathlistClick = () => {
@@ -78,7 +99,7 @@ export default class CardPresenter {
     this.#changeData({...this.#card, userDetails: {
       ...this.#card.userDetails,
       isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
-      watchingDate: Date.now(),
+      watchingDate: new Date().toUTCString(),
     }});
   };
 }
