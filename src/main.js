@@ -17,8 +17,6 @@ const cardCount = cardModel.data.length;
 render(new NewProffileView(), siteHeaderElement);
 render(new NewStatisticView(cardCount), siteStatisticsElement);
 
-// const filterPresenter = new FilterPresenter(siteMainElement, cardModel);
 const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel);
 
-// filterPresenter.init();
 boardPresenter.init();
