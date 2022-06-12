@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {getHumanReadableTime, getHumanReadableDate, getCommentDate, onCtrlEnterKeydown} from '../utils.js';
+import {getHumanReadableTime, getHumanReadableDate, getCommentDate, onCtrlEnterKeydown} from '../utils/utils.js';
 
 /**
  * Получение шаблона списка жанров для фильма.

@@ -1,4 +1,4 @@
-import {getRandomNumber, getRandomFloat, getRandomArrayElement, getRandomList, getRandomDate} from '../utils.js';
+import {getRandomNumber, getRandomFloat, getRandomArrayElement, getRandomList, getRandomDate} from '../utils/utils.js';
 
 const Ratings = {
   MIN: 2,

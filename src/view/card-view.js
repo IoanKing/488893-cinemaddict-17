@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {getYearDate, getHumanReadableTime} from '../utils.js';
+import {getYearDate, getHumanReadableTime} from '../utils/utils.js';
 import {Setting} from '../const.js';
 
 /**

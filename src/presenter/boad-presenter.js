@@ -5,10 +5,10 @@ import NewCardListContainerView from '../view/card-list-container-view.js';
 import {render, RenderPosition} from '../framework/render.js';
 import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
-import {updateItem} from '../utils.js';
+import {updateItem, sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
 import FilterPresenter from './filter-presenter.js';
-import {Setting} from '../const.js';
+import {Setting, SortType} from '../const.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -18,6 +18,8 @@ export default class BoardPresenter {
   #commentModel = null;
 
   #cardPresenter = new Map();
+  #currentSortType = SortType.DEFAULT;
+  #sourcedBoardCards = [];
   #filterPresenter = null;
 
   #sortComponent = new NewSortView();
@@ -38,6 +40,7 @@ export default class BoardPresenter {
 
   init = () => {
     this.#boardCards  = [...this.#movieModel.data];
+    this.#sourcedBoardCards = [...this.#movieModel.data];
     this.#boardComments  = [...this.#commentModel.data];
 
     this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
@@ -60,25 +63,46 @@ export default class BoardPresenter {
     this.#renderCardsList();
   };
 
+  // ======= Фильтры =======
+
   #renderFilters = () => {
     this.#filterPresenter = new FilterPresenter(this.#boardContainer);
     this.#filterPresenter.init(this.#boardCards);
   };
 
-  // #handleSortTypeChange = (sortType) => {
-  //   // - Сортируем задачи
-  //   // - Очищаем список
-  //   // - Рендерим список заново
-  // };
+  // ======= Сортировка =======
+
+  #sortCards = (sortType) => {
+    switch (sortType) {
+      case SortType.BY_DATE:
+        this.#boardCards.sort(sortCardDate);
+        break;
+      case SortType.BY_RATIO:
+        this.#boardCards.sort(sortCardRate);
+        break;
+      default:
+        this.#boardCards = [...this.#sourcedBoardCards];
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortCards(sortType);
+    this.#clearCardsList();
+    this.#renderCardsList();
+  };
 
   #renderSort = () => {
     render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
-    // this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
-  #renderNoCard = () => {
-    render(this.#noCardComponent, this.#cardComponent.element);
-  };
+  // ======= Блоки с карточками =======
 
   #renderCardListBlock = () => {
     render(this.#cardListComponent, this.#boardComponent.element);
@@ -86,6 +110,12 @@ export default class BoardPresenter {
 
   #renderCardBlock = () => {
     render(this.#cardComponent, this.#cardListComponent.element);
+  };
+
+  // ======= Карточки фильмов =======
+
+  #renderNoCard = () => {
+    render(this.#noCardComponent, this.#cardComponent.element);
   };
 
   #renderCardsList = () => {
@@ -113,14 +143,11 @@ export default class BoardPresenter {
 
   #onCardChange = (updatedCard) => {
     this.#boardCards = updateItem(this.#boardCards, updatedCard);
+    this.#sourcedBoardCards = updateItem(this.#boardCards, updatedCard);
     const currentCard = this.#cardPresenter.get(updatedCard.id);
     currentCard.init(updatedCard, this.#boardComments);
     this.#filterPresenter.destroy();
     this.#renderFilters();
-  };
-
-  #onPopupOpend = () => {
-    this.#cardPresenter.forEach((presenter) => presenter.resetPopup());
   };
 
   #renderCards = (from, to, elementComponent) => {
@@ -128,6 +155,12 @@ export default class BoardPresenter {
       .slice(from, to)
       .forEach((card) => this.#renderCard(card, elementComponent, this.#boardComments));
   };
+
+  #onPopupOpend = () => {
+    this.#cardPresenter.forEach((presenter) => presenter.resetPopup());
+  };
+
+  // ======= Кнопка Show more =======
 
   #renderShowMoreButton = () => {
     this.#showMoreButtonComponent.init(this.#onShowMoreButtonClick);

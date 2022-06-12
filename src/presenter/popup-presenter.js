@@ -1,6 +1,6 @@
 import {render, remove, replace} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
-import {onEscKeydown} from '../utils.js';
+import {onEscKeydown} from '../utils/utils.js';
 
 export default class PopupPresenter {
   #comments = null;

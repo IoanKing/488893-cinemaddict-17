@@ -1,4 +1,4 @@
-import {getRandomArrayElement, getRandomDate} from '../utils.js';
+import {getRandomArrayElement, getRandomDate} from '../utils/utils.js';
 
 const commentEmotions = ['smile', 'sleeping', 'puke', 'angry'];
 

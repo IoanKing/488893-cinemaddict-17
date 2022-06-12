@@ -11,7 +11,6 @@ const ESC_ALL_BROWSERS = 'Escape';
 const ESC_IE = 'Esc';
 const ENTER_ALL_BROWSERS = 'Enter';
 
-
 /**
 * Функция возвращающая случайное целое число из переданного диапазона
 * включительно.
@@ -153,20 +152,6 @@ const onEscKeydown = (evt) => evt.key === ESC_ALL_BROWSERS || evt.key === ESC_IE
  */
 const onCtrlEnterKeydown = (evt) => evt.ctrlKey && evt.key === ENTER_ALL_BROWSERS;
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
 export {
   getRandomNumber,
   getRandomFloat,
@@ -179,6 +164,5 @@ export {
   getHumanReadableDate,
   getCommentDate,
   onEscKeydown,
-  onCtrlEnterKeydown,
-  updateItem
+  onCtrlEnterKeydown
 };

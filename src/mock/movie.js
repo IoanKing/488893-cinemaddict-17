@@ -1,4 +1,4 @@
-import {getRandomNumber} from '../utils.js';
+import {getRandomNumber} from '../utils/utils.js';
 import {genereteMovieInfo} from './movie-info.js';
 import {generateUserDetails} from './user-detail.js';
 import {nanoid} from 'nanoid';
