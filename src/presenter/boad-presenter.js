@@ -8,30 +8,33 @@ import CardPresenter from './card-presenter.js';
 import {updateItem} from '../utils.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
 import PopupPresenter from './popup-presenter.js';
+import FilterPresenter from './filter-presenter.js';
 
 const COUNT_LIST_MOVIES = 5;
-const COUNT_LIST_ADDITIONAL = 2;
+// const COUNT_LIST_ADDITIONAL = 2;
 
 export default class BoardPresenter {
   #boardContainer = null;
   #boardCards = [];
   #boardComments = [];
-  #cardPresenter = new Map();
-  #popupPresentor = null;
   #movieModel = null;
   #commentModel = null;
+
+  #cardPresenter = new Map();
+  #popupPresentor = null;
+  #filterPresenter = null;
 
   #sortComponent = new NewSortView();
   #noCardComponent = new NoCardView();
   #boardComponent = new NewBoardView();
   #cardListComponent = new NewCardListView();
 
-  #topListComponent = new NewCardListView(true, 'Top rated');
-  #commentedListComponent = new NewCardListView(true, 'Most commented');
+  // #topListComponent = new NewCardListView(true, 'Top rated');
+  // #commentedListComponent = new NewCardListView(true, 'Most commented');
 
   #cardComponent = new NewCardListContainerView();
-  #cardTopRatedComponent = new NewCardListContainerView();
-  #cardCommentedComponent = new NewCardListContainerView();
+  // #cardTopRatedComponent = new NewCardListContainerView();
+  // #cardCommentedComponent = new NewCardListContainerView();
 
   #showMoreButtonComponent = null;
   #renderedCardCount = COUNT_LIST_MOVIES;
@@ -55,6 +58,7 @@ export default class BoardPresenter {
 
   #renderBoard = () => {
     render(this.#boardComponent, this.#boardContainer);
+    this.#renderFilters();
     this.#renderCardListBlock();
     this.#renderCardBlock();
     this.#renderSort();
@@ -65,8 +69,13 @@ export default class BoardPresenter {
     }
 
     this.#renderCardsList();
-    this.#renderCardsTopList();
-    this.#renderCardsCommentedList();
+    // this.#renderCardsTopList();
+    // this.#renderCardsCommentedList();
+  };
+
+  #renderFilters = () => {
+    this.#filterPresenter = new FilterPresenter(this.#boardContainer);
+    this.#filterPresenter.init(this.#boardCards);
   };
 
   #renderSort = () => {
@@ -100,17 +109,17 @@ export default class BoardPresenter {
     this.#showMoreButtonComponent.destroy();
   };
 
-  #renderCardsTopList = () => {
-    render(this.#topListComponent, this.#boardComponent.element);
-    render(this.#cardTopRatedComponent, this.#topListComponent.element);
-    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_ADDITIONAL, this.#cardTopRatedComponent.element);
-  };
+  // #renderCardsTopList = () => {
+  //   render(this.#topListComponent, this.#boardComponent.element);
+  //   render(this.#cardTopRatedComponent, this.#topListComponent.element);
+  //   this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_ADDITIONAL, this.#cardTopRatedComponent.element);
+  // };
 
-  #renderCardsCommentedList = () => {
-    render(this.#commentedListComponent, this.#boardComponent.element);
-    render(this.#cardCommentedComponent, this.#commentedListComponent.element);
-    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_ADDITIONAL, this.#cardCommentedComponent.element);
-  };
+  // #renderCardsCommentedList = () => {
+  //   render(this.#commentedListComponent, this.#boardComponent.element);
+  //   render(this.#cardCommentedComponent, this.#commentedListComponent.element);
+  //   this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + COUNT_LIST_ADDITIONAL, this.#cardCommentedComponent.element);
+  // };
 
   #renderCard = (card, elementComponent, comments) => {
     const cardPresenter = new CardPresenter(elementComponent, this.#onTaskChange);
@@ -124,6 +133,9 @@ export default class BoardPresenter {
   #onTaskChange = (updatedCard) => {
     this.#boardCards = updateItem(this.#boardCards, updatedCard);
     this.#cardPresenter.get(updatedCard.id).init(updatedCard, this.#boardComments);
+    this.#cardPresenter.get(updatedCard.id).setClickHandler(this.#renderPopup);
+    this.#filterPresenter.destroy();
+    this.#renderFilters();
   };
 
   #renderPopup = (card, comments) => {

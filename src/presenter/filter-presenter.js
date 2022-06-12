@@ -1,30 +1,35 @@
 import NewFilterView from '../view/filter-view.js';
-import {render} from '../framework/render.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
 
 export default class FilterPresenter {
-  #dataModel = null;
-  #filterContainer = null;
+  #data = null;
+  #container = null;
   #watchlistCount = 0;
   #historyCount = 0;
   #favoritesCount = 0;
+  #component = null;
 
-  constructor(filterContainer, dataModel) {
-    this.#filterContainer = filterContainer;
-    this.#dataModel = dataModel;
+  constructor(container) {
+    this.#container = container;
   }
 
-  init = () => {
-    this.#dataModel = [...this.#dataModel.data];
+  init = (data) => {
+    this.#data = [...data];
 
-    this.#watchlistCount = this.#dataModel.filter((values) => values.userDetails.watchlist).length;
-    this.#historyCount = this.#dataModel.filter((values) => values.userDetails.isAlreadyWatched).length;
-    this.#favoritesCount = this.#dataModel.filter((values) => values.userDetails.favorite).length;
+    this.#watchlistCount = this.#data.filter((values) => values.userDetails.watchlist).length;
+    this.#historyCount = this.#data.filter((values) => values.userDetails.isAlreadyWatched).length;
+    this.#favoritesCount = this.#data.filter((values) => values.userDetails.favorite).length;
 
     this.#renderFilters(this.#watchlistCount, this.#historyCount, this.#favoritesCount);
   };
 
+  destroy() {
+    remove(this.#component);
+  }
+
   #renderFilters = (watchlistCount, historyCount, favoritesCount) => {
-    render(new NewFilterView(watchlistCount, historyCount, favoritesCount), this.#filterContainer);
+    this.#component = new NewFilterView(watchlistCount, historyCount, favoritesCount);
+    render(this.#component, this.#container, RenderPosition.BEFOREBEGIN);
   };
 
 }

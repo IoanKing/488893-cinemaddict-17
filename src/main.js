@@ -1,7 +1,7 @@
 import NewProffileView from './view/profile-view.js';
 import NewStatisticView from './view/statistics-view.js';
 import BoardPresenter from './presenter/boad-presenter.js';
-import FilterPresenter from './presenter/filter-presenter.js';
+// import FilterPresenter from './presenter/filter-presenter.js';
 import {render} from './framework/render.js';
 import CardModel from './model/movie-models.js';
 import CommentModel from './model/comment-models.js';
@@ -17,8 +17,8 @@ const cardCount = cardModel.data.length;
 render(new NewProffileView(), siteHeaderElement);
 render(new NewStatisticView(cardCount), siteStatisticsElement);
 
-const filterPresenter = new FilterPresenter(siteMainElement, cardModel);
+// const filterPresenter = new FilterPresenter(siteMainElement, cardModel);
 const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel);
 
-filterPresenter.init();
+// filterPresenter.init();
 boardPresenter.init();

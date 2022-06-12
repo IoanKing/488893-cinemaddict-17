@@ -28,15 +28,24 @@ export default class CardPresenter {
     if (prevCardComponent === null) {
       render(this.#cardComponent, this.#cardListContainer);
       this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
+      this.#cardComponent.setFavoriteClickHandler(this.#onFavoriteClick);
+      this.#cardComponent.setWatchedClickHandler(this.#onWatchedClick);
       return;
     }
 
     if (this.#cardListContainer.contains(prevCardComponent.element)) {
       replace(this.#cardComponent, prevCardComponent);
+      this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
+      this.#cardComponent.setFavoriteClickHandler(this.#onFavoriteClick);
+      this.#cardComponent.setWatchedClickHandler(this.#onWatchedClick);
     }
 
     remove(prevCardComponent);
   };
+
+  get card() {
+    return this.#card;
+  }
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
@@ -52,6 +61,24 @@ export default class CardPresenter {
   };
 
   #onWathlistClick = () => {
-    this.#changeData({...this.#card, watchlist: !this.#card.userDetails.watchlist});
+    this.#changeData({...this.#card, userDetails: {
+      ...this.#card.userDetails,
+      watchlist: !this.#card.userDetails.watchlist
+    }});
+  };
+
+  #onFavoriteClick = () => {
+    this.#changeData({...this.#card, userDetails: {
+      ...this.#card.userDetails,
+      favorite: !this.#card.userDetails.favorite
+    }});
+  };
+
+  #onWatchedClick = () => {
+    this.#changeData({...this.#card, userDetails: {
+      ...this.#card.userDetails,
+      isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
+      watchingDate: Date.now(),
+    }});
   };
 }
