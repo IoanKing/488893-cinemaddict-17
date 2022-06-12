@@ -1,14 +1,13 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {getYearDate, getHumanReadableTime} from '../utils.js';
-
-const MAX_TEXT_LENGTH = 130;
+import {getYearDate, getHumanReadableTime} from '../utils/utils.js';
+import {Setting} from '../const.js';
 
 /**
  * Обрезка текста более заданого количества символов.
  * @param {string} text - Исходный текст.
  * @returns - Обрезанный текст.
  */
-const getDescriptionShort = (text) => `${text.substring(0, MAX_TEXT_LENGTH)}${(text.length > MAX_TEXT_LENGTH) ? '...' : ''} `;
+const getDescriptionShort = (text) => `${text.substring(0, Setting.MAX_TEXT_LENGTH)}${(text.length > Setting.MAX_TEXT_LENGTH) ? '...' : ''} `;
 
 /**
  * Получение шаблона карточки фильма.
@@ -71,8 +70,40 @@ export default class NewCardView extends AbstractView {
     this.element.querySelector('.film-card__link').addEventListener('click', this.#editClickHandler);
   };
 
+  setWatchlistClickHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+    this.element
+      .querySelector('.film-card__controls-item--add-to-watchlist')
+      .addEventListener('click', (evt) => {
+        this.#cardControlClickHandler(evt, this._callback.watchlistClick);
+      });
+  };
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element
+      .querySelector('.film-card__controls-item--favorite')
+      .addEventListener('click', (evt) => {
+        this.#cardControlClickHandler(evt, this._callback.favoriteClick);
+      });
+  };
+
+  setWatchedClickHandler = (callback) => {
+    this._callback.watchedClick = callback;
+    this.element
+      .querySelector('.film-card__controls-item--mark-as-watched')
+      .addEventListener('click', (evt) => {
+        this.#cardControlClickHandler(evt, this._callback.watchedClick);
+      });
+  };
+
   #editClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.editClick();
+  };
+
+  #cardControlClickHandler = (evt, callback) => {
+    evt.preventDefault();
+    callback();
   };
 }

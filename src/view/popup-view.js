@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {getHumanReadableTime, getHumanReadableDate, getCommentDate, onCtrlEnterKeydown} from '../utils.js';
+import {getHumanReadableTime, getHumanReadableDate, getCommentDate, onCtrlEnterKeydown} from '../utils/utils.js';
 
 /**
  * Получение шаблона списка жанров для фильма.
@@ -207,5 +207,35 @@ export default class NewPopupView extends AbstractView {
       evt.preventDefault();
       this._callback.formSubmit();
     }
+  };
+
+  setWatchlistClickHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
+  };
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  setWatchedClickHandler = (callback) => {
+    this._callback.watchedClick = callback;
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#wathcedClickHandler);
+  };
+
+  #watchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  };
+
+  #wathcedClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchedClick();
   };
 }

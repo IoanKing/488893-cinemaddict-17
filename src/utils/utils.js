@@ -11,7 +11,6 @@ const ESC_ALL_BROWSERS = 'Escape';
 const ESC_IE = 'Esc';
 const ENTER_ALL_BROWSERS = 'Enter';
 
-
 /**
 * Функция возвращающая случайное целое число из переданного диапазона
 * включительно.

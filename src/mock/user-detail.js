@@ -1,4 +1,4 @@
-import {getRandomDate, getRandomNumber} from '../utils.js';
+import {getRandomDate, getRandomNumber} from '../utils/utils.js';
 
 const Years = {
   MIN: 2015,
