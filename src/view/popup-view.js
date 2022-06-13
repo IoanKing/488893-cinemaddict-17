@@ -6,6 +6,7 @@ import {
   onCtrlEnterKeydown,
   // debounce
 } from '../utils/utils.js';
+import {nanoid} from 'nanoid';
 
 const BLANK_CARD = {
   id: null,
@@ -226,16 +227,18 @@ export default class NewPopupView extends AbstractStatefulView {
 
   static parseCardToState = (card) => ({...card,
     scrollPosition: 0,
+    commentId: nanoid(),
     emotionIcon: null,
     commentText: ''
   });
 
-  static parseStateToCard = (state) => {
-    const card = {...state};
-    delete card.scrollPosition;
-    delete card.emotionIcon;
-    delete card.commentText;
-    return card;
+  static parseStateToComment = (state) => {
+    const newComment = {
+      id: state.commentId,
+      text: state.commentText,
+      emotion: state.emotionIcon,
+    };
+    return newComment;
   };
 
   get template() {
@@ -298,7 +301,7 @@ export default class NewPopupView extends AbstractStatefulView {
   #submitFormHandler = (evt) => {
     if (onCtrlEnterKeydown(evt)) {
       evt.preventDefault();
-      this._callback.formSubmit();
+      this._callback.formSubmit(NewPopupView.parseStateToComment(this._state));
     }
   };
 

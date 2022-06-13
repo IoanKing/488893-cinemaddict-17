@@ -9,10 +9,12 @@ export default class PopupPresenter {
 
   #elementComponent = null;
   #popupComponent = null;
+  #commentAdd = null;
 
-  constructor(elementComponent, changeData) {
+  constructor(elementComponent, changeData, commentAdd) {
     this.#elementComponent = elementComponent;
     this.#changeData = changeData;
+    this.#commentAdd = commentAdd;
   }
 
   init = (card, comments) => {
@@ -53,8 +55,8 @@ export default class PopupPresenter {
     this.#popupComponent.setWatchedClickHandler(() => this.#onCardControlClick('watched'));
   };
 
-  #onSubmit = () => {
-    //нужно добавить функцию обновленя комментариев.
+  #onSubmit = (element) => {
+    this.#commentAdd(element);
     this.#removePopup();
   };
 

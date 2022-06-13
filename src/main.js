@@ -10,7 +10,6 @@ const siteMainElement = document.querySelector('.main');
 const siteStatisticsElement = document.querySelector('.footer__statistics');
 const commentModel = new CommentModel();
 const commentIds = commentModel.data.map((element) => element.id);
-console.log();
 const cardModel = new CardModel(commentIds);
 const cardCount = cardModel.data.length;
 

@@ -6,4 +6,9 @@ export default class CommentModel {
   get data() {
     return this.#data;
   }
+
+  set data(element) {
+    const newElement = generateComment(element);
+    this.#data.push(newElement);
+  }
 }
