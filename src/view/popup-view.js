@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {getHumanReadableTime, getHumanReadableDate, getCommentDate, onCtrlEnterKeydown} from '../utils/utils.js';
 
 /**
@@ -173,7 +173,7 @@ const createPopupTemplate = (data, comments) => {
     </section>`;
 };
 
-export default class NewPopupView extends AbstractView {
+export default class NewPopupView extends AbstractStatefulView {
   #data = null;
   #comments = null;
 

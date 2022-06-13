@@ -33,7 +33,7 @@ const getWeightForNullDate = (dateA, dateB) => {
 const sortCardDate = (cardA, cardB) => {
   const weight = getWeightForNullDate(cardA.filmInfo.release.date, cardB.filmInfo.release.date);
 
-  return weight ?? dayjs(cardA.filmInfo.release.date).diff(dayjs(cardB.filmInfo.release.date));
+  return weight ?? dayjs(cardB.filmInfo.release.date).diff(dayjs(cardA.filmInfo.release.date));
 };
 
 const sortCardRate = (cardA, cardB) => {

@@ -23,7 +23,7 @@ export default class CardPresenter {
 
   init = (card, comments) => {
     this.#card = card;
-    this.#comments = comments.filter((values) => this.#card.comments.has(values.id));
+    this.#comments = comments.filter((values) =>this.#card.comments.has(values.id));
 
     const prevCardComponent = this.#cardComponent;
 

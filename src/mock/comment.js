@@ -1,4 +1,5 @@
 import {getRandomArrayElement, getRandomDate} from '../utils/utils.js';
+import {nanoid} from 'nanoid';
 
 const commentEmotions = ['smile', 'sleeping', 'puke', 'angry'];
 
@@ -40,14 +41,12 @@ const comments = [
   'Enim praesent elementum facilisis leo vel fringilla est.',
 ];
 
-let commentCount = 0;
-
 /**
  * Генерация комментариев.
  * @returns {object} - Комментарий.
  */
 export const generateComment = () => ({
-  id: commentCount++,
+  id: nanoid(),
   author: getRandomArrayElement(authors),
   comment: getRandomArrayElement(comments),
   date: getRandomDate(Years.MIN, Years.MAX),
