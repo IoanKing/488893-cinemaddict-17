@@ -45,10 +45,10 @@ const comments = [
  * Генерация комментариев.
  * @returns {object} - Комментарий.
  */
-export const generateComment = () => ({
+export const generateComment = (comment = null, date = null, emotion = null) => ({
   id: nanoid(),
   author: getRandomArrayElement(authors),
-  comment: getRandomArrayElement(comments),
-  date: getRandomDate(Years.MIN, Years.MAX),
-  emotion: getRandomArrayElement(commentEmotions),
+  comment: (comment === null) ? getRandomArrayElement(comments) : comment,
+  date: (date === null) ? getRandomDate(Years.MIN, Years.MAX) : date,
+  emotion: (emotion === null) ? getRandomArrayElement(commentEmotions) : emotion,
 });

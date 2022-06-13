@@ -10,6 +10,7 @@ dayjs.extend(relativeTime);
 const ESC_ALL_BROWSERS = 'Escape';
 const ESC_IE = 'Esc';
 const ENTER_ALL_BROWSERS = 'Enter';
+const DEBOUNCE_TIME = 500;
 
 /**
 * Функция возвращающая случайное целое число из переданного диапазона
@@ -152,6 +153,20 @@ const onEscKeydown = (evt) => evt.key === ESC_ALL_BROWSERS || evt.key === ESC_IE
  */
 const onCtrlEnterKeydown = (evt) => evt.ctrlKey && evt.key === ENTER_ALL_BROWSERS;
 
+/**
+ * Устранения дребезга.
+ * @param {object} cb - Collback функция.
+ * @param {number} timeoutDelay - Задержка выполнения функции.
+ * @returns - Выполнение Collback функции с задержкой.
+ */
+const debounce = (cb, timeoutDelay = DEBOUNCE_TIME) => {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => cb.apply(null, rest), timeoutDelay);
+  };
+};
+
 export {
   getRandomNumber,
   getRandomFloat,
@@ -164,5 +179,6 @@ export {
   getHumanReadableDate,
   getCommentDate,
   onEscKeydown,
-  onCtrlEnterKeydown
+  onCtrlEnterKeydown,
+  debounce
 };

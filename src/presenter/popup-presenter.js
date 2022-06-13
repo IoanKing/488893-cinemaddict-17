@@ -45,10 +45,17 @@ export default class PopupPresenter {
   };
 
   #setHandlers = () => {
+    this.#popupComponent.setScrollHandler();
+    this.#popupComponent.setFormSubmitHandler(this.#onSubmit);
     this.#popupComponent.setCloseClickHandler(this.#onCloseClick);
     this.#popupComponent.setWatchlistClickHandler(() => this.#onCardControlClick('watchlist'));
     this.#popupComponent.setFavoriteClickHandler(() => this.#onCardControlClick('favorite'));
     this.#popupComponent.setWatchedClickHandler(() => this.#onCardControlClick('watched'));
+  };
+
+  #onSubmit = () => {
+    //нужно добавить функцию обновленя комментариев.
+    this.#removePopup();
   };
 
   #addPopup = () => {
