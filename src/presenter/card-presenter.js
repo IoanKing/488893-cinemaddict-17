@@ -14,11 +14,13 @@ export default class CardPresenter {
 
   #popupPresentor = null;
   #onPopupOpen = false;
+  #onCommentAdded = null;
 
-  constructor(cardListContainer, changeData, onPopupOpen) {
+  constructor(cardListContainer, changeData, onPopupOpen, onCommentAdded) {
     this.#cardListContainer = cardListContainer;
     this.#changeData = changeData;
     this.#onPopupOpen = onPopupOpen;
+    this.#onCommentAdded = onCommentAdded;
   }
 
   init = (card, comments) => {
@@ -71,7 +73,7 @@ export default class CardPresenter {
 
   #renderPopup = (card, comments) => {
     this.#onPopupOpen();
-    const popupPresenter = new PopupPresenter(bodyComponent, this.#onPopupChange);
+    const popupPresenter = new PopupPresenter(bodyComponent, this.#onPopupChange, this.#onCommentAdd);
     popupPresenter.init(card, comments);
 
     this.#popupPresentor = popupPresenter;
@@ -91,12 +93,16 @@ export default class CardPresenter {
     }
   };
 
+  #onCommentAdd = (element) => {
+    this.#onCommentAdded(element);
+    this.#changeData({...this.#card, comments: this.#card.comments.add(element.id)});
+  };
+
   #onWathlistClick = () => {
     this.#changeData({...this.#card, userDetails: {
       ...this.#card.userDetails,
       watchlist: !this.#card.userDetails.watchlist
     }});
-    this.#reRenderPopup();
   };
 
   #onFavoriteClick = () => {
@@ -104,7 +110,6 @@ export default class CardPresenter {
       ...this.#card.userDetails,
       favorite: !this.#card.userDetails.favorite
     }});
-    this.#reRenderPopup();
   };
 
   #onWatchedClick = () => {
@@ -113,12 +118,5 @@ export default class CardPresenter {
       isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
       watchingDate: new Date().toUTCString(),
     }});
-    this.#reRenderPopup();
-  };
-
-  #reRenderPopup = () => {
-    if (this.#popupPresentor !== null) {
-      this.#popupPresentor.init(this.#card, this.#comments);
-    }
   };
 }

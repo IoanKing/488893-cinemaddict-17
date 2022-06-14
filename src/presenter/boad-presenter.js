@@ -136,7 +136,7 @@ export default class BoardPresenter {
   };
 
   #renderCard = (card, elementComponent, comments) => {
-    const cardPresenter = new CardPresenter(elementComponent, this.#onCardChange, this.#onPopupOpend);
+    const cardPresenter = new CardPresenter(elementComponent, this.#onCardChange, this.#onPopupOpend, this.#onCommentAdded);
     cardPresenter.init(card, comments);
     this.#cardPresenter.set(card.id, cardPresenter);
   };
@@ -158,6 +158,11 @@ export default class BoardPresenter {
 
   #onPopupOpend = () => {
     this.#cardPresenter.forEach((presenter) => presenter.resetPopup());
+  };
+
+  #onCommentAdded = (element) => {
+    this.#commentModel.data = element;
+    this.#boardComments  = [...this.#commentModel.data];
   };
 
   // ======= Кнопка Show more =======

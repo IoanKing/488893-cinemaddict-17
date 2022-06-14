@@ -1,4 +1,5 @@
 import {getRandomArrayElement, getRandomDate} from '../utils/utils.js';
+import {nanoid} from 'nanoid';
 
 const commentEmotions = ['smile', 'sleeping', 'puke', 'angry'];
 
@@ -7,7 +8,7 @@ const Years = {
   MAX: 2022
 };
 
-const authors = [
+const commentAuthors = [
   'Lorem ipsum',
   'Ut morbi',
   'Labore et dolore',
@@ -22,7 +23,7 @@ const authors = [
   'Placerat duis',
 ];
 
-const comments = [
+const commentTexts = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
   'Ut morbi tincidunt augue interdum velit euismod in pellentesque massa.',
   'Imperdiet sed euismod nisi porta lorem.',
@@ -40,16 +41,26 @@ const comments = [
   'Enim praesent elementum facilisis leo vel fringilla est.',
 ];
 
-let commentCount = 0;
-
 /**
  * Генерация комментариев.
  * @returns {object} - Комментарий.
  */
-export const generateComment = () => ({
-  id: commentCount++,
-  author: getRandomArrayElement(authors),
-  comment: getRandomArrayElement(comments),
-  date: getRandomDate(Years.MIN, Years.MAX),
-  emotion: getRandomArrayElement(commentEmotions),
-});
+export const generateComment = (element = null) => {
+  if (element === null) {
+    return {
+      id: nanoid(),
+      author: getRandomArrayElement(commentAuthors),
+      comment: getRandomArrayElement(commentTexts),
+      date: getRandomDate(Years.MIN, Years.MAX),
+      emotion: getRandomArrayElement(commentEmotions),
+    };
+  }
+
+  return {
+    id: element.id,
+    author: getRandomArrayElement(commentAuthors),
+    comment: element.text,
+    date: new Date().toUTCString(),
+    emotion: element.emotion,
+  };
+};

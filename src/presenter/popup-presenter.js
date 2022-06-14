@@ -9,10 +9,12 @@ export default class PopupPresenter {
 
   #elementComponent = null;
   #popupComponent = null;
+  #commentAdd = null;
 
-  constructor(elementComponent, changeData) {
+  constructor(elementComponent, changeData, commentAdd) {
     this.#elementComponent = elementComponent;
     this.#changeData = changeData;
+    this.#commentAdd = commentAdd;
   }
 
   init = (card, comments) => {
@@ -45,10 +47,17 @@ export default class PopupPresenter {
   };
 
   #setHandlers = () => {
+    this.#popupComponent.setScrollHandler();
+    this.#popupComponent.setFormSubmitHandler(this.#onSubmit);
     this.#popupComponent.setCloseClickHandler(this.#onCloseClick);
     this.#popupComponent.setWatchlistClickHandler(() => this.#onCardControlClick('watchlist'));
     this.#popupComponent.setFavoriteClickHandler(() => this.#onCardControlClick('favorite'));
     this.#popupComponent.setWatchedClickHandler(() => this.#onCardControlClick('watched'));
+  };
+
+  #onSubmit = (element) => {
+    this.#commentAdd(element);
+    this.#removePopup();
   };
 
   #addPopup = () => {
