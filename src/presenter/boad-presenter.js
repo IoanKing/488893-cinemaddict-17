@@ -38,6 +38,10 @@ export default class BoardPresenter {
     this.#commentModel = commentModel;
   }
 
+  get cards() {
+    return this.#movieModel.cards;
+  }
+
   init = () => {
     this.#boardCards  = [...this.#movieModel.data];
     this.#sourcedBoardCards = [...this.#movieModel.data];
