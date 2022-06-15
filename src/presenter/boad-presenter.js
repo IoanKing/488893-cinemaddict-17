@@ -8,7 +8,7 @@ import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
 import FilterPresenter from './filter-presenter.js';
-import {Setting, SortType} from '../const.js';
+import {Setting, SortType, UpdateType, UserAction} from '../const.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -93,19 +93,32 @@ export default class BoardPresenter {
   };
 
   #onViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_TASK:
+        this.#movieModel.updateCard(updateType, update);
+        break;
+      case UserAction.ADD_TASK:
+        this.#movieModel.addCard(updateType, update);
+        break;
+      case UserAction.DELETE_TASK:
+        this.#movieModel.deleteCard(updateType, update);
+        break;
+    }
   };
 
   #onModelEvent = (updateType, data) => {
-    console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case UpdateType.PATCH:
+        // - обновить часть списка (например, когда поменялось описание)
+        this.#movieModel.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        break;
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        break;
+    }
   };
 
   #renderSort = () => {
