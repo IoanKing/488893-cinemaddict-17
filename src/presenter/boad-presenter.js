@@ -36,22 +36,26 @@ export default class BoardPresenter {
     this.#boardContainer = boardContainer;
     this.#movieModel = movieModel;
     this.#commentModel = commentModel;
+
+    this.#movieModel.addObserver(this.#onModelEvent);
   }
 
   get cards() {
     switch (this.#currentSortType) {
       case SortType.BY_DATE:
-        return [...this.#movieModel.data].sort(sortCardDate);
+        return [...this.#movieModel.cards].sort(sortCardDate);
       case SortType.BY_RATIO:
-        return [...this.#movieModel.data].sort(sortCardRate);
+        return [...this.#movieModel.cards].sort(sortCardRate);
     }
-    return this.#movieModel.data;
+    return this.#movieModel.cards;
   }
 
   init = () => {
     this.#boardComments  = [...this.#commentModel.data];
 
     this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
+
+    this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
 
     this.#renderBoard();
   };
@@ -78,7 +82,7 @@ export default class BoardPresenter {
 
   // ======= Сортировка =======
 
-  #handleSortTypeChange = (sortType) => {
+  #onSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }
@@ -88,9 +92,25 @@ export default class BoardPresenter {
     this.#renderCardsList();
   };
 
+  #onViewAction = (actionType, updateType, update) => {
+    console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+  };
+
+  #onModelEvent = (updateType, data) => {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
+  };
+
   #renderSort = () => {
     render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
-    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    this.#sortComponent.setSortTypeChangeHandler(this.#onSortTypeChange);
   };
 
   // ======= Карточки фильмов =======
@@ -121,16 +141,16 @@ export default class BoardPresenter {
   };
 
   #renderCard = (card, component, comments) => {
-    const cardPresenter = new CardPresenter(component, this.#onCardChange, this.#onPopupOpend, this.#onCommentAdded);
+    const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend, this.#onCommentAdded);
     cardPresenter.init(card, comments);
     this.#cardPresenter.set(card.id, cardPresenter);
   };
 
-  #onCardChange = (updatedCard) => {
-    this.#cardPresenter.get(updatedCard.id).init(updatedCard, this.#boardComments);
-    this.#filterPresenter.destroy();
-    this.#renderFilters();
-  };
+  // #onCardChange = (updatedCard) => {
+  //   this.#cardPresenter.get(updatedCard.id).init(updatedCard, this.#boardComments);
+  //   this.#filterPresenter.destroy();
+  //   this.#renderFilters();
+  // };
 
   #renderCards = (cards, component) => {
     cards.forEach((card) => this.#renderCard(card, component, this.#boardComments));

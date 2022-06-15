@@ -17,4 +17,16 @@ const SortType = {
   BY_RATIO: 'ratio',
 };
 
-export {Setting, FilterType, SortType};
+const UserAction = {
+  UPDATE_TASK: 'UPDATE_TASK',
+  ADD_TASK: 'ADD_TASK',
+  DELETE_TASK: 'DELETE_TASK',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export {Setting, FilterType, SortType, UserAction, UpdateType};

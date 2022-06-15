@@ -1,6 +1,7 @@
 import NewCardView from '../view/card-view.js';
 import {render, replace, remove} from '../framework/render.js';
 import PopupPresenter from './popup-presenter.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const bodyComponent = document.querySelector('body');
 
@@ -99,24 +100,34 @@ export default class CardPresenter {
   };
 
   #onWathlistClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      watchlist: !this.#card.userDetails.watchlist
-    }});
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {...this.#card, userDetails: {
+        ...this.#card.userDetails,
+        watchlist: !this.#card.userDetails.watchlist
+      }},
+    );
   };
 
   #onFavoriteClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      favorite: !this.#card.userDetails.favorite
-    }});
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {...this.#card, userDetails: {
+        ...this.#card.userDetails,
+        favorite: !this.#card.userDetails.favorite
+      }});
   };
 
   #onWatchedClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
-      watchingDate: new Date().toUTCString(),
-    }});
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {...this.#card, userDetails: {
+        ...this.#card.userDetails,
+        isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
+        watchingDate: new Date().toUTCString(),
+      }});
   };
 }

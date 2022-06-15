@@ -11,7 +11,7 @@ const siteStatisticsElement = document.querySelector('.footer__statistics');
 const commentModel = new CommentModel();
 const commentIds = commentModel.data.map((element) => element.id);
 const cardModel = new CardModel(commentIds);
-const cardCount = cardModel.data.length;
+const cardCount = cardModel.cards.length;
 
 render(new NewProffileView(), siteHeaderElement);
 render(new NewStatisticView(cardCount), siteStatisticsElement);

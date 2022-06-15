@@ -2,7 +2,7 @@ import NewFilterView from '../view/filter-view.js';
 import {render, RenderPosition, remove} from '../framework/render.js';
 
 export default class FilterPresenter {
-  #data = null;
+  #cards = null;
   #container = null;
   #watchlistCount = 0;
   #historyCount = 0;
@@ -13,12 +13,12 @@ export default class FilterPresenter {
     this.#container = container;
   }
 
-  init = (data) => {
-    this.#data = [...data];
+  init = (cards) => {
+    this.#cards = [...cards];
 
-    this.#watchlistCount = this.#data.filter((values) => values.userDetails.watchlist).length;
-    this.#historyCount = this.#data.filter((values) => values.userDetails.isAlreadyWatched).length;
-    this.#favoritesCount = this.#data.filter((values) => values.userDetails.favorite).length;
+    this.#watchlistCount = this.#cards.filter((values) => values.userDetails.watchlist).length;
+    this.#historyCount = this.#cards.filter((values) => values.userDetails.isAlreadyWatched).length;
+    this.#favoritesCount = this.#cards.filter((values) => values.userDetails.favorite).length;
 
     this.#renderFilters(this.#watchlistCount, this.#historyCount, this.#favoritesCount);
   };
