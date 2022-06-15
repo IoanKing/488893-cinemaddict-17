@@ -2,7 +2,7 @@ import NewBoardView from '../view/board-view.js';
 import NewCardListView from '../view/card-list-view.js';
 import NewSortView from '../view/sort-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
-import {render, RenderPosition} from '../framework/render.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
 import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
@@ -12,8 +12,6 @@ import {Setting, SortType, UpdateType, UserAction} from '../const.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
-  // #boardCards = [];
-  // #sourcedBoardCards = [];
   #boardComments = [];
   #movieModel = null;
   #commentModel = null;
@@ -22,13 +20,14 @@ export default class BoardPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterPresenter = null;
 
-  #sortComponent = new NewSortView();
+  // #sortComponent = new NewSortView();
   #noCardComponent = new NoCardView();
   #boardComponent = new NewBoardView();
   #cardListComponent = new NewCardListView();
 
   #cardComponent = new NewCardListContainerView();
 
+  #sortComponent = null;
   #showMoreButtonComponent = null;
   #renderedCardCount = 0;
 
@@ -53,27 +52,63 @@ export default class BoardPresenter {
   init = () => {
     this.#boardComments  = [...this.#commentModel.data];
 
-    this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
+    // this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
 
     this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
 
+    this.#renderFilters();
     this.#renderBoard();
   };
 
   #renderBoard = () => {
+    const cards = this.cards;
+    const cardCount = cards.length;
     render(this.#boardComponent, this.#boardContainer);
-    this.#renderFilters();
+    this.#renderCardListBlock();
     this.#renderSort();
 
-    if (this.cards.length === 0) {
+    if (cardCount === 0) {
       this.#renderNoCard();
       return;
     }
 
-    this.#renderCardsList();
+    this.#renderCards(cards.slice(0, Math.min(cardCount, this.#renderedCardCount)), this.#cardComponent.element);
+
+    if (cardCount > Setting.COUNT_LIST_MOVIES) {
+      this.#renderShowMoreButton();
+    }
+  };
+
+  #clearBoard = ({resetRenderedCardCount = false, resetSortType = false} = {}) => {
+    const cardCount = this.cards.length;
+
+    this.#cardPresenter.forEach((presenter) => presenter.destroy());
+    this.#cardPresenter.clear();
+
+    remove(this.#sortComponent);
+    remove(this.#noCardComponent);
+    this.#showMoreButtonComponent.destroy();
+
+    if (resetRenderedCardCount) {
+      this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
+    } else {
+      // На случай, если перерисовка доски вызвана
+      // уменьшением количества задач (например, удаление или перенос в архив)
+      // нужно скорректировать число показанных задач
+      this.#renderedCardCount = Math.min(cardCount, this.#renderedCardCount);
+    }
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
   };
 
   // ======= Фильтры =======
+
+  #renderCardListBlock = () => {
+    render(this.#cardListComponent, this.#boardComponent.element);
+    render(this.#cardComponent, this.#cardListComponent.element);
+  };
 
   #renderFilters = () => {
     this.#filterPresenter = new FilterPresenter(this.#boardContainer);
@@ -88,19 +123,19 @@ export default class BoardPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#clearCardsList();
-    this.#renderCardsList();
+    this.#clearBoard({resetRenderedCardCount: true});
+    this.#renderBoard();
   };
 
   #onViewAction = (actionType, updateType, update) => {
     switch (actionType) {
-      case UserAction.UPDATE_TASK:
+      case UserAction.UPDATE_CARD:
         this.#movieModel.updateCard(updateType, update);
         break;
-      case UserAction.ADD_TASK:
+      case UserAction.ADD_CARD:
         this.#movieModel.addCard(updateType, update);
         break;
-      case UserAction.DELETE_TASK:
+      case UserAction.DELETE_CARD:
         this.#movieModel.deleteCard(updateType, update);
         break;
     }
@@ -109,21 +144,24 @@ export default class BoardPresenter {
   #onModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
         this.#movieModel.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
+        this.#clearBoard();
+        this.#renderBoard();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        this.#clearBoard({resetRenderedCardCount: true, resetSortType: true});
+        this.#renderBoard();
         break;
     }
   };
 
   #renderSort = () => {
-    render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
+    // this.#renderBoard();
+    this.#sortComponent = new NewSortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#onSortTypeChange);
+    render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
   };
 
   // ======= Карточки фильмов =======
@@ -132,38 +170,11 @@ export default class BoardPresenter {
     render(this.#noCardComponent, this.#cardComponent.element);
   };
 
-  #renderCardsList = () => {
-    const cardCount = this.cards.length;
-    const cards = this.cards.slice(0, Math.min(cardCount, Setting.COUNT_LIST_MOVIES));
-
-    render(this.#cardListComponent, this.#boardComponent.element);
-    render(this.#cardComponent, this.#cardListComponent.element);
-
-    this.#renderCards(cards, this.#cardComponent.element);
-
-    if (cardCount > Setting.COUNT_LIST_MOVIES) {
-      this.#renderShowMoreButton();
-    }
-  };
-
-  #clearCardsList = () => {
-    this.#cardPresenter.forEach((presenter) => presenter.destroy());
-    this.#cardPresenter.clear();
-    this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
-    this.#showMoreButtonComponent.destroy();
-  };
-
   #renderCard = (card, component, comments) => {
     const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend, this.#onCommentAdded);
     cardPresenter.init(card, comments);
     this.#cardPresenter.set(card.id, cardPresenter);
   };
-
-  // #onCardChange = (updatedCard) => {
-  //   this.#cardPresenter.get(updatedCard.id).init(updatedCard, this.#boardComments);
-  //   this.#filterPresenter.destroy();
-  //   this.#renderFilters();
-  // };
 
   #renderCards = (cards, component) => {
     cards.forEach((card) => this.#renderCard(card, component, this.#boardComments));
@@ -181,6 +192,7 @@ export default class BoardPresenter {
   // ======= Кнопка Show more =======
 
   #renderShowMoreButton = () => {
+    this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
     this.#showMoreButtonComponent.init(this.#onShowMoreButtonClick);
   };
 
