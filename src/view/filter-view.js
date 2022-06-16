@@ -15,7 +15,7 @@ const createFilterTemplate = (filterItems, currentFilterType) => {
   return `<nav class="main-navigation">${filterItemsTemplate}</nav>`;
 };
 
-export default class NewFilterView extends AbstractView {
+export default class FilterView extends AbstractView {
   #filters = null;
   #currentFilterType = null;
 
@@ -28,4 +28,14 @@ export default class NewFilterView extends AbstractView {
   get template() {
     return createFilterTemplate(this.#filters, this.#currentFilterType);
   }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+  };
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  };
 }

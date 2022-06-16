@@ -14,12 +14,11 @@ const commentModel = new CommentModel();
 const filterModel = new FilterModel();
 const commentIds = commentModel.comments.map((element) => element.id);
 const cardModel = new CardModel(commentIds);
-const cardCount = cardModel.cards.length;
 
 render(new NewProffileView(), siteHeaderElement);
-render(new NewStatisticView(cardCount), siteStatisticsElement);
+render(new NewStatisticView(cardModel), siteStatisticsElement);
 
-const filterPresentor = new FilterPresenter(siteMainElement, filterModel.filter);
+const filterPresentor = new FilterPresenter(siteMainElement, filterModel, cardModel);
 const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel);
-filterPresentor.init(cardModel);
+filterPresentor.init();
 boardPresenter.init();

@@ -5,9 +5,9 @@ const createStatisticTemplate = (count) => `<p>${count} movies inside</p>`;
 export default class NewStatisticView extends AbstractView {
   #count = 0;
 
-  constructor(count) {
+  constructor(cardModel) {
     super();
-    this.#count = count;
+    this.#count = cardModel.cards.length;
   }
 
   get template() {
