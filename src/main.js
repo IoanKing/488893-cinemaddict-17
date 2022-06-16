@@ -5,6 +5,7 @@ import {render} from './framework/render.js';
 import CardModel from './model/card-models.js';
 import CommentModel from './model/comment-models.js';
 import FilterModel from './model/filter-model.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
@@ -18,6 +19,7 @@ const cardCount = cardModel.cards.length;
 render(new NewProffileView(), siteHeaderElement);
 render(new NewStatisticView(cardCount), siteStatisticsElement);
 
+const filterPresentor = new FilterPresenter(siteMainElement, filterModel.filter);
 const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel);
-
+filterPresentor.init(cardModel);
 boardPresenter.init();

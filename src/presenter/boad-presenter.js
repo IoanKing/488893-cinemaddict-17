@@ -7,7 +7,6 @@ import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
-import FilterPresenter from './filter-presenter.js';
 import {Setting, SortType, UpdateType, UserAction, CommentAction} from '../const.js';
 
 export default class BoardPresenter {
@@ -18,7 +17,6 @@ export default class BoardPresenter {
 
   #cardPresenter = new Map();
   #currentSortType = SortType.DEFAULT;
-  #filterPresenter = null;
 
   // #sortComponent = new NewSortView();
   #noCardComponent = new NoCardView();
@@ -55,8 +53,6 @@ export default class BoardPresenter {
 
   init = () => {
     this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
-
-    this.#renderFilters();
     this.#renderBoard();
   };
 
@@ -107,14 +103,6 @@ export default class BoardPresenter {
     render(this.#cardComponent, this.#cardListComponent.element);
   };
 
-  #renderFilters = () => {
-    if (this.#filterPresenter !== null) {
-      this.#filterPresenter.destroy();
-    }
-    this.#filterPresenter = new FilterPresenter(this.#boardContainer);
-    this.#filterPresenter.init(this.cards);
-  };
-
   // ======= Сортировка =======
 
   #onSortTypeChange = (sortType) => {
@@ -155,16 +143,13 @@ export default class BoardPresenter {
   #onCardModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#renderFilters();
         this.#cardPresenter.get(data.id).init(data, this.comments);
         break;
       case UpdateType.MINOR:
-        this.#renderFilters();
         this.#clearBoard();
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
-        this.#renderFilters();
         this.#clearBoard({resetRenderedCardCount: true, resetSortType: true});
         this.#renderBoard();
         break;
