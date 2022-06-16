@@ -49,11 +49,11 @@ export default class BoardPresenter {
     return this.#movieModel.cards;
   }
 
+  get comments() {
+    return [...this.#commentModel.comments];
+  }
+
   init = () => {
-    this.#boardComments  = [...this.#commentModel.data];
-
-    // this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
-
     this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
 
     this.#renderFilters();
@@ -92,9 +92,6 @@ export default class BoardPresenter {
     if (resetRenderedCardCount) {
       this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества задач (например, удаление или перенос в архив)
-      // нужно скорректировать число показанных задач
       this.#renderedCardCount = Math.min(cardCount, this.#renderedCardCount);
     }
 
@@ -111,6 +108,9 @@ export default class BoardPresenter {
   };
 
   #renderFilters = () => {
+    if (this.#filterPresenter !== null) {
+      this.#filterPresenter.destroy();
+    }
     this.#filterPresenter = new FilterPresenter(this.#boardContainer);
     this.#filterPresenter.init(this.cards);
   };
@@ -144,13 +144,16 @@ export default class BoardPresenter {
   #onModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#movieModel.get(data.id).init(data);
+        this.#renderFilters();
+        this.#cardPresenter.get(data.id).init(data, this.comments);
         break;
       case UpdateType.MINOR:
+        this.#renderFilters();
         this.#clearBoard();
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
+        this.#renderFilters();
         this.#clearBoard({resetRenderedCardCount: true, resetSortType: true});
         this.#renderBoard();
         break;
@@ -158,7 +161,6 @@ export default class BoardPresenter {
   };
 
   #renderSort = () => {
-    // this.#renderBoard();
     this.#sortComponent = new NewSortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#onSortTypeChange);
     render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
@@ -177,7 +179,7 @@ export default class BoardPresenter {
   };
 
   #renderCards = (cards, component) => {
-    cards.forEach((card) => this.#renderCard(card, component, this.#boardComments));
+    cards.forEach((card) => this.#renderCard(card, component, this.comments));
   };
 
   #onPopupOpend = () => {
@@ -186,7 +188,7 @@ export default class BoardPresenter {
 
   #onCommentAdded = (element) => {
     this.#commentModel.data = element;
-    this.#boardComments  = [...this.#commentModel.data];
+    this.comments = [...this.#commentModel.data];
   };
 
   // ======= Кнопка Show more =======

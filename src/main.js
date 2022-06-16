@@ -9,7 +9,7 @@ const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteStatisticsElement = document.querySelector('.footer__statistics');
 const commentModel = new CommentModel();
-const commentIds = commentModel.data.map((element) => element.id);
+const commentIds = commentModel.comments.map((element) => element.id);
 const cardModel = new CardModel(commentIds);
 const cardCount = cardModel.cards.length;
 

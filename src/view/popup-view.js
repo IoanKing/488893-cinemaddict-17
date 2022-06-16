@@ -245,6 +245,14 @@ export default class NewPopupView extends AbstractStatefulView {
     return createPopupTemplate(this._state, this.#comments);
   }
 
+  get scrollPosition() {
+    return this.element.scrollTop;
+  }
+
+  set scrollPosition(position) {
+    this.element.scrollTop = position;
+  }
+
   setScrollHandler = () => {
     this.element.addEventListener('scroll', () => {
       this._state.scrollPosition = this.element.scrollTop;

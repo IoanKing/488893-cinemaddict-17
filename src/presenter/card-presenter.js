@@ -92,6 +92,7 @@ export default class CardPresenter {
         this.#onWatchedClick();
         break;
     }
+    this.#popupPresentor.init(this.#card, this.#comments);
   };
 
   #onCommentAdd = (element) => {
@@ -101,8 +102,8 @@ export default class CardPresenter {
 
   #onWathlistClick = () => {
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_CARD,
+      UpdateType.PATCH,
       {...this.#card, userDetails: {
         ...this.#card.userDetails,
         watchlist: !this.#card.userDetails.watchlist
@@ -112,8 +113,8 @@ export default class CardPresenter {
 
   #onFavoriteClick = () => {
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_CARD,
+      UpdateType.PATCH,
       {...this.#card, userDetails: {
         ...this.#card.userDetails,
         favorite: !this.#card.userDetails.favorite
@@ -122,8 +123,8 @@ export default class CardPresenter {
 
   #onWatchedClick = () => {
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_CARD,
+      UpdateType.PATCH,
       {...this.#card, userDetails: {
         ...this.#card.userDetails,
         isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,

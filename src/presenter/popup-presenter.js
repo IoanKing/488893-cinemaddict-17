@@ -10,6 +10,7 @@ export default class PopupPresenter {
   #elementComponent = null;
   #popupComponent = null;
   #commentAdd = null;
+  #position = 0;
 
   constructor(elementComponent, changeData, commentAdd) {
     this.#elementComponent = elementComponent;
@@ -31,7 +32,9 @@ export default class PopupPresenter {
     }
 
     if (this.#elementComponent.contains(prevPopupComponent.element)) {
+      this.#position = prevPopupComponent.scrollPosition;
       replace(this.#popupComponent, prevPopupComponent);
+      this.#popupComponent.scrollPosition = this.#position;
       this.#setHandlers();
     }
 
