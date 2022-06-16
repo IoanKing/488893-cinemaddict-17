@@ -8,7 +8,7 @@ import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
 import FilterPresenter from './filter-presenter.js';
-import {Setting, SortType, UpdateType, UserAction} from '../const.js';
+import {Setting, SortType, UpdateType, UserAction, CommentAction} from '../const.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -36,7 +36,7 @@ export default class BoardPresenter {
     this.#movieModel = movieModel;
     this.#commentModel = commentModel;
 
-    this.#movieModel.addObserver(this.#onModelEvent);
+    this.#movieModel.addObserver(this.#onCardModelEvent);
   }
 
   get cards() {
@@ -141,7 +141,18 @@ export default class BoardPresenter {
     }
   };
 
-  #onModelEvent = (updateType, data) => {
+  #onNewComment = (actionType, updateType, update) => {
+    switch (actionType) {
+      case CommentAction.ADD_COMMENT:
+        this.#commentModel.addComment(updateType, update);
+        break;
+      case CommentAction.DELETE_COMMENT:
+        this.#commentModel.deleteComment(updateType, update);
+        break;
+    }
+  };
+
+  #onCardModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
         this.#renderFilters();
@@ -173,7 +184,7 @@ export default class BoardPresenter {
   };
 
   #renderCard = (card, component, comments) => {
-    const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend, this.#onCommentAdded);
+    const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend, this.#onNewComment);
     cardPresenter.init(card, comments);
     this.#cardPresenter.set(card.id, cardPresenter);
   };
@@ -184,11 +195,6 @@ export default class BoardPresenter {
 
   #onPopupOpend = () => {
     this.#cardPresenter.forEach((presenter) => presenter.resetPopup());
-  };
-
-  #onCommentAdded = (element) => {
-    this.#commentModel.data = element;
-    this.comments = [...this.#commentModel.data];
   };
 
   // ======= Кнопка Show more =======

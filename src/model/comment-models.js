@@ -8,14 +8,10 @@ export default class CommentModel extends Observable {
     return this.#comments;
   }
 
-  set comments(element) {
-    const newElement = generateComment(element);
-    this.#comments.push(newElement);
-  }
-
   addComment = (updateType, update) => {
+    const newElement = generateComment(update);
     this.#comments = [
-      update,
+      newElement,
       ...this.#comments,
     ];
 

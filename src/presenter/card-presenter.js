@@ -1,7 +1,7 @@
 import NewCardView from '../view/card-view.js';
 import {render, replace, remove} from '../framework/render.js';
 import PopupPresenter from './popup-presenter.js';
-import {UserAction, UpdateType} from '../const.js';
+import {UserAction, UpdateType, CommentAction} from '../const.js';
 
 const bodyComponent = document.querySelector('body');
 
@@ -15,13 +15,13 @@ export default class CardPresenter {
 
   #popupPresentor = null;
   #onPopupOpen = false;
-  #onCommentAdded = null;
+  #addComment = null;
 
-  constructor(cardListContainer, changeData, onPopupOpen, onCommentAdded) {
+  constructor(cardListContainer, changeData, onPopupOpen, addComment) {
     this.#cardListContainer = cardListContainer;
     this.#changeData = changeData;
     this.#onPopupOpen = onPopupOpen;
-    this.#onCommentAdded = onCommentAdded;
+    this.#addComment = addComment;
   }
 
   init = (card, comments) => {
@@ -96,8 +96,16 @@ export default class CardPresenter {
   };
 
   #onCommentAdd = (element) => {
-    this.#onCommentAdded(element);
-    this.#changeData({...this.#card, comments: this.#card.comments.add(element.id)});
+    this.#addComment(
+      CommentAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      element,
+    );
+    this.#changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.PATCH,
+      {...this.#card, comments: this.#card.comments.add(element.id)},
+    );
   };
 
   #onWathlistClick = () => {

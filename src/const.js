@@ -29,4 +29,9 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
-export {Setting, FilterType, SortType, UserAction, UpdateType};
+const CommentAction = {
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+export {Setting, FilterType, SortType, UserAction, UpdateType, CommentAction};

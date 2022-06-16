@@ -237,6 +237,7 @@ export default class NewPopupView extends AbstractStatefulView {
       id: state.commentId,
       text: state.commentText,
       emotion: state.emotionIcon,
+      cardId: state.id
     };
     return newComment;
   };
