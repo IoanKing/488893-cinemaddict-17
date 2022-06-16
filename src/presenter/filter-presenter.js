@@ -8,6 +8,7 @@ export default class FilterPresenter {
   #historyCount = 0;
   #favoritesCount = 0;
   #component = null;
+  #filterPresentor = null;
 
   constructor(container) {
     this.#container = container;
@@ -28,8 +29,12 @@ export default class FilterPresenter {
   }
 
   #renderFilters = (watchlistCount, historyCount, favoritesCount) => {
+    if (this.#filterPresentor !== null) {
+      this.#filterPresentor.destroy();
+    }
     this.#component = new NewFilterView(watchlistCount, historyCount, favoritesCount);
     render(this.#component, this.#container, RenderPosition.BEFOREBEGIN);
+    this.#filterPresentor = this.#component;
   };
 
 }
