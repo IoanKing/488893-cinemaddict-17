@@ -111,7 +111,7 @@ export default class CardPresenter {
   #onWathlistClick = () => {
     this.#changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#card, userDetails: {
         ...this.#card.userDetails,
         watchlist: !this.#card.userDetails.watchlist
@@ -122,7 +122,7 @@ export default class CardPresenter {
   #onFavoriteClick = () => {
     this.#changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#card, userDetails: {
         ...this.#card.userDetails,
         favorite: !this.#card.userDetails.favorite
@@ -132,7 +132,7 @@ export default class CardPresenter {
   #onWatchedClick = () => {
     this.#changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#card, userDetails: {
         ...this.#card.userDetails,
         isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,

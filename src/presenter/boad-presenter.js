@@ -8,17 +8,18 @@ import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
 import {Setting, SortType, UpdateType, UserAction, CommentAction} from '../const.js';
+import {filter} from '../utils/filter.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
   #boardComments = [];
-  #movieModel = null;
+  #cardModel = null;
   #commentModel = null;
+  #filterModel = null;
 
   #cardPresenter = new Map();
   #currentSortType = SortType.DEFAULT;
 
-  // #sortComponent = new NewSortView();
   #noCardComponent = new NoCardView();
   #boardComponent = new NewBoardView();
   #cardListComponent = new NewCardListView();
@@ -29,22 +30,28 @@ export default class BoardPresenter {
   #showMoreButtonComponent = null;
   #renderedCardCount = 0;
 
-  constructor(boardContainer, movieModel, commentModel) {
+  constructor(boardContainer, cardModel, commentModel, filterModel) {
     this.#boardContainer = boardContainer;
-    this.#movieModel = movieModel;
+    this.#cardModel = cardModel;
     this.#commentModel = commentModel;
+    this.#filterModel = filterModel;
 
-    this.#movieModel.addObserver(this.#onCardModelEvent);
+    this.#cardModel.addObserver(this.#onCardModelEvent);
+    this.#filterModel.addObserver(this.#onCardModelEvent);
   }
 
   get cards() {
+    const filterType = this.#filterModel.filter;
+    const cards = this.#cardModel.cards;
+    const filteredCards = filter[filterType](cards);
+
     switch (this.#currentSortType) {
       case SortType.BY_DATE:
-        return [...this.#movieModel.cards].sort(sortCardDate);
+        return filteredCards.sort(sortCardDate);
       case SortType.BY_RATIO:
-        return [...this.#movieModel.cards].sort(sortCardRate);
+        return filteredCards.sort(sortCardRate);
     }
-    return this.#movieModel.cards;
+    return filteredCards;
   }
 
   get comments() {
@@ -118,13 +125,13 @@ export default class BoardPresenter {
   #onViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_CARD:
-        this.#movieModel.updateCard(updateType, update);
+        this.#cardModel.updateCard(updateType, update);
         break;
       case UserAction.ADD_CARD:
-        this.#movieModel.addCard(updateType, update);
+        this.#cardModel.addCard(updateType, update);
         break;
       case UserAction.DELETE_CARD:
-        this.#movieModel.deleteCard(updateType, update);
+        this.#cardModel.deleteCard(updateType, update);
         break;
     }
   };

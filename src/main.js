@@ -19,6 +19,6 @@ render(new NewProffileView(), siteHeaderElement);
 render(new NewStatisticView(cardModel), siteStatisticsElement);
 
 const filterPresentor = new FilterPresenter(siteMainElement, filterModel, cardModel);
-const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel);
+const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel, filterModel);
 filterPresentor.init();
 boardPresenter.init();
