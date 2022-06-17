@@ -4,7 +4,7 @@ import {
   getHumanReadableDate,
   getCommentDate,
   onCtrlEnterKeydown,
-  // debounce
+  debounce
 } from '../utils/utils.js';
 import {nanoid} from 'nanoid';
 
@@ -263,10 +263,10 @@ export default class NewPopupView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element
       .querySelectorAll('.film-details__emoji-item')
-      .forEach((element) => element.addEventListener('click', this.#onEmotionClick));
+      .forEach((element) => element.addEventListener('click', debounce(this.#onEmotionClick)));
     this.element
       .querySelector('.film-details__comment-input')
-      .addEventListener('input', this.#commentInputHandler);
+      .addEventListener('input', debounce(this.#commentInputHandler));
   };
 
   _restoreHandlers = () => {
@@ -277,10 +277,6 @@ export default class NewPopupView extends AbstractStatefulView {
   #commentInputHandler = (evt) => {
     evt.preventDefault();
     this._state.commentText = evt.target.value;
-    // debounce(() => {
-    //   this._state.commentText = evt.target.value;
-    //   console.log(this._state.commentText);
-    // });
   };
 
   setFormSubmitHandler = (callback) => {
