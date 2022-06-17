@@ -7,7 +7,7 @@ import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
-import {Setting, SortType, UpdateType, UserAction, CommentAction} from '../const.js';
+import {Setting, SortType, UpdateType, UserAction, CommentAction, FilterType} from '../const.js';
 import {filter} from '../utils/filter.js';
 
 export default class BoardPresenter {
@@ -20,7 +20,7 @@ export default class BoardPresenter {
   #cardPresenter = new Map();
   #currentSortType = SortType.DEFAULT;
 
-  #noCardComponent = new NoCardView();
+  #noCardComponent = null;
   #boardComponent = new NewBoardView();
   #cardListComponent = new NewCardListView();
 
@@ -29,6 +29,7 @@ export default class BoardPresenter {
   #sortComponent = null;
   #showMoreButtonComponent = null;
   #renderedCardCount = 0;
+  #filterType = FilterType.ALL;
 
   constructor(boardContainer, cardModel, commentModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -41,9 +42,9 @@ export default class BoardPresenter {
   }
 
   get cards() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const cards = this.#cardModel.cards;
-    const filteredCards = filter[filterType](cards);
+    const filteredCards = filter[this.#filterType](cards);
 
     switch (this.#currentSortType) {
       case SortType.BY_DATE:
@@ -91,6 +92,10 @@ export default class BoardPresenter {
     remove(this.#sortComponent);
     remove(this.#noCardComponent);
     this.#showMoreButtonComponent.destroy();
+
+    if (this.#noCardComponent) {
+      remove(this.#noCardComponent);
+    }
 
     if (resetRenderedCardCount) {
       this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
@@ -172,6 +177,7 @@ export default class BoardPresenter {
   // ======= Карточки фильмов =======
 
   #renderNoCard = () => {
+    this.#noCardComponent = new NoCardView(this.#filterType);
     render(this.#noCardComponent, this.#cardComponent.element);
   };
 
