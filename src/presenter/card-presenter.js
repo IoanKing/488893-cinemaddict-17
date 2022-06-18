@@ -1,13 +1,13 @@
 import NewCardView from '../view/card-view.js';
 import {render, replace, remove} from '../framework/render.js';
 import PopupPresenter from './popup-presenter.js';
-import {UserAction, UpdateType, CommentAction} from '../const.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const bodyComponent = document.querySelector('body');
 
 export default class CardPresenter {
   #cardListContainer = null;
-  #comments = null;
+  #commentModel = null;
   #card = null;
   #cardComponent = null;
   #changeData = null;
@@ -15,18 +15,17 @@ export default class CardPresenter {
 
   #popupPresentor = null;
   #onPopupOpen = false;
-  #addComment = null;
 
-  constructor(cardListContainer, changeData, onPopupOpen, addComment) {
+  constructor(cardListContainer, changeData, onPopupOpen) {
     this.#cardListContainer = cardListContainer;
     this.#changeData = changeData;
     this.#onPopupOpen = onPopupOpen;
-    this.#addComment = addComment;
   }
 
-  init = (card, comments) => {
+  init = (card, commentModel) => {
     this.#card = card;
-    this.#comments = comments.filter((values) => this.#card.comments.has(values.id));
+    this.#commentModel = commentModel;
+    this.#commentModel.addObserver(this.#onCommentAddEvent);
 
     const prevCardComponent = this.#cardComponent;
 
@@ -58,7 +57,7 @@ export default class CardPresenter {
   };
 
   #popupClickHandler = () => {
-    this.#renderPopup(this.#card, this.#comments);
+    this.#renderPopup(this.#card, this.#commentModel);
   };
 
   resetPopup = () => {
@@ -69,12 +68,13 @@ export default class CardPresenter {
   };
 
   destroy = () => {
+    this.#commentModel.removeObserver(this.#onCommentAddEvent);
     remove(this.#cardComponent);
   };
 
   #renderPopup = (card, comments) => {
     this.#onPopupOpen();
-    const popupPresenter = new PopupPresenter(bodyComponent, this.#onPopupChange, this.#onCommentAdd);
+    const popupPresenter = new PopupPresenter(bodyComponent, this.#onPopupChange);
     popupPresenter.init(card, comments);
 
     this.#popupPresentor = popupPresenter;
@@ -92,20 +92,17 @@ export default class CardPresenter {
         this.#onWatchedClick();
         break;
     }
-    this.#popupPresentor.init(this.#card, this.#comments);
+    this.#popupPresentor.init(this.#card, this.#commentModel);
   };
 
-  #onCommentAdd = (element) => {
-    this.#addComment(
-      CommentAction.ADD_COMMENT,
-      UpdateType.PATCH,
-      element,
-    );
-    this.#changeData(
-      UserAction.UPDATE_CARD,
-      UpdateType.PATCH,
-      {...this.#card, comments: this.#card.comments.add(element.id)},
-    );
+  #onCommentAddEvent = (updateType, data) => {
+    if (data.cardId === this.#card.id) {
+      this.#changeData(
+        UserAction.UPDATE_CARD,
+        updateType,
+        {...this.#card, comments: this.#card.comments.add(data.id)},
+      );
+    }
   };
 
   #onWathlistClick = () => {

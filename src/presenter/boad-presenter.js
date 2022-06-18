@@ -7,7 +7,7 @@ import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
-import {Setting, SortType, UpdateType, UserAction, CommentAction, FilterType} from '../const.js';
+import {Setting, SortType, UpdateType, UserAction, FilterType} from '../const.js';
 import {filter} from '../utils/filter.js';
 
 export default class BoardPresenter {
@@ -108,14 +108,10 @@ export default class BoardPresenter {
     }
   };
 
-  // ======= Фильтры =======
-
   #renderCardListBlock = () => {
     render(this.#cardListComponent, this.#boardComponent.element);
     render(this.#cardComponent, this.#cardListComponent.element);
   };
-
-  // ======= Сортировка =======
 
   #onSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
@@ -141,21 +137,10 @@ export default class BoardPresenter {
     }
   };
 
-  #onNewComment = (actionType, updateType, update) => {
-    switch (actionType) {
-      case CommentAction.ADD_COMMENT:
-        this.#commentModel.addComment(updateType, update);
-        break;
-      case CommentAction.DELETE_COMMENT:
-        this.#commentModel.deleteComment(updateType, update);
-        break;
-    }
-  };
-
   #onCardModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#cardPresenter.get(data.id).init(data, this.comments);
+        this.#cardPresenter.get(data.id).init(data, this.#commentModel);
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
@@ -174,28 +159,24 @@ export default class BoardPresenter {
     render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
   };
 
-  // ======= Карточки фильмов =======
-
   #renderNoCard = () => {
     this.#noCardComponent = new NoCardView(this.#filterType);
     render(this.#noCardComponent, this.#cardComponent.element);
   };
 
   #renderCard = (card, component, comments) => {
-    const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend, this.#onNewComment);
+    const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend);
     cardPresenter.init(card, comments);
     this.#cardPresenter.set(card.id, cardPresenter);
   };
 
   #renderCards = (cards, component) => {
-    cards.forEach((card) => this.#renderCard(card, component, this.comments));
+    cards.forEach((card) => this.#renderCard(card, component, this.#commentModel));
   };
 
   #onPopupOpend = () => {
     this.#cardPresenter.forEach((presenter) => presenter.resetPopup());
   };
-
-  // ======= Кнопка Show more =======
 
   #renderShowMoreButton = () => {
     this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);

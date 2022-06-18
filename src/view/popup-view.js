@@ -2,7 +2,6 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {
   getHumanReadableTime,
   getHumanReadableDate,
-  getCommentDate,
   onCtrlEnterKeydown,
   debounce
 } from '../utils/utils.js';
@@ -45,32 +44,6 @@ const createGenresTemplates = (genres) => {
   let result = '';
   for (const genre of genres) {
     result += `<span class="film-details__genre">${genre}</span>`;
-  }
-  return result;
-};
-
-/**
- * Получение шаблона комментариев.
- * @param {object} comments - Данные комментариев.
- * @returns - Шаблон.
- */
-const createCommentsTemplate = (comments) => {
-  let result = '';
-  for (const comm of comments) {
-    const {emotion, comment, author, date} = comm;
-    result += `<li class="film-details__comment">
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${comment}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${getCommentDate(date)}</span>
-        <button class="film-details__comment-delete">Delete</button>
-      </p>
-    </div>
-  </li>`;
   }
   return result;
 };
@@ -177,7 +150,6 @@ const createPopupTemplate = (data, comments) => {
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${createCommentsTemplate(comments)}
           </ul>
 
           <div class="film-details__new-comment">
@@ -217,11 +189,13 @@ const createPopupTemplate = (data, comments) => {
 
 export default class NewPopupView extends AbstractStatefulView {
   #comments = null;
+  #onEmotionChange = null;
 
-  constructor(card = BLANK_CARD, comments) {
+  constructor(card = BLANK_CARD, comments, onEmotionChange) {
     super();
     this._state = NewPopupView.parseCardToState(card);
     this.#comments = comments;
+    this.#onEmotionChange = onEmotionChange;
     this.#setInnerHandlers();
   }
 
@@ -295,6 +269,7 @@ export default class NewPopupView extends AbstractStatefulView {
       emotionIcon: evt.target.value,
       commentText: this._state.commentText
     });
+    this.#onEmotionChange();
     this.element.scrollTop = this._state.scrollPosition;
   };
 
