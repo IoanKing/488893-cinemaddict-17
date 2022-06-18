@@ -151,7 +151,7 @@ const onEscKeydown = (evt) => evt.key === ESC_ALL_BROWSERS || evt.key === ESC_IE
  * Проверка нажатия клавишы CTRL + ENTER.
  * @returns {boolean}
  */
-const onCtrlEnterKeydown = (evt) => evt.ctrlKey && evt.key === ENTER_ALL_BROWSERS;
+const onCtrlEnterKeydown = (evt) =>(evt.ctrlKey || evt.metaKey) && evt.key === ENTER_ALL_BROWSERS;
 
 /**
  * Устранения дребезга.
