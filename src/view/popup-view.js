@@ -6,6 +6,7 @@ import {
   debounce
 } from '../utils/utils.js';
 import {nanoid} from 'nanoid';
+import he from 'he';
 
 const BLANK_CARD = {
   id: null,
@@ -156,7 +157,7 @@ const createPopupTemplate = (data, comments) => {
             <div class="film-details__add-emoji-label">${createEmotionTemplate(emotionIcon)}</div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText}</textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(commentText)}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -190,14 +191,12 @@ const createPopupTemplate = (data, comments) => {
 export default class NewPopupView extends AbstractStatefulView {
   #comments = null;
   #onEmotionChange = null;
-  #onCommentdelete = null;
 
-  constructor(card = BLANK_CARD, comments, onEmotionChange, onCommentdelete) {
+  constructor(card = BLANK_CARD, comments, onEmotionChange) {
     super();
     this._state = NewPopupView.parseCardToState(card);
     this.#comments = comments;
     this.#onEmotionChange = onEmotionChange;
-    this.#onCommentdelete = onCommentdelete;
     this.#setInnerHandlers();
   }
 
