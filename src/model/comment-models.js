@@ -14,7 +14,6 @@ export default class CommentModel extends Observable {
       newElement,
       ...this.#comments,
     ];
-
     this._notify(updateType, update);
   };
 
@@ -22,7 +21,7 @@ export default class CommentModel extends Observable {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting card');
+      throw new Error('Can\'t delete unexisting comment');
     }
 
     this.#comments = [
@@ -30,6 +29,6 @@ export default class CommentModel extends Observable {
       ...this.#comments.slice(index + 1),
     ];
 
-    this._notify(updateType);
+    this._notify(updateType, update);
   };
 }

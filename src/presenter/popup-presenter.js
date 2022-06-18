@@ -5,7 +5,6 @@ import CommentPresenter from '../presenter/comment-presenter.js';
 import {UpdateType} from '../const.js';
 
 export default class PopupPresenter {
-  #comments = null;
   #commentModel = null;
   #card = null;
   #changeData = null;
@@ -23,10 +22,10 @@ export default class PopupPresenter {
   init = (card, commentModel) => {
     this.#card = card;
     this.#commentModel = commentModel;
-    this.#comments = this.#commentModel.comments.filter((values) => this.#card.comments.has(values.id));
+    this.#commentModel.addObserver(this.#renderCommentList);
 
     const prevPopupComponent = this.#popupComponent;
-    this.#popupComponent = new NewPopupView(this.#card, this.#comments, this.#onEmotionClick);
+    this.#popupComponent = new NewPopupView(this.#card, this.comments, this.#onEmotionClick);
 
     if (prevPopupComponent === null) {
       this.#addPopup();
@@ -48,6 +47,10 @@ export default class PopupPresenter {
     return this.#popupComponent;
   }
 
+  get comments() {
+    return this.#commentModel.comments.filter((values) => this.#card.comments.has(values.id));
+  }
+
   get commentListComponent() {
     return this.#popupComponent.element.querySelector('.film-details__comments-list');
   }
@@ -63,9 +66,12 @@ export default class PopupPresenter {
     this.#commentPresentor.set(comment.id, commentsPresenter);
   };
 
+  #onCommentAdd = (data) => {
+    this.#commentModel.addComment(UpdateType.PATCH, data);
+  };
+
   #onEmotionClick = () => {
     this.#renderCommentList();
-    // Прошу проверить, правильно ли здесь выставлено обновление хандлеров? При клике на эмоцию пропадали обработчики событий. наверное из-за того что карточка перерисовывается.
     this.#setHandlers();
   };
 
@@ -74,7 +80,7 @@ export default class PopupPresenter {
       this.#commentPresentor.forEach((presenter) => presenter.destroy());
       this.#commentPresentor.clear();
     }
-    this.#comments.forEach((comment) => this.#renderComment(comment));
+    this.comments.forEach((comment) => this.#renderComment(comment));
   };
 
   #setHandlers = () => {
@@ -91,15 +97,11 @@ export default class PopupPresenter {
     this.#removePopup();
   };
 
-  #onCommentAdd = (element) => {
-    this.#commentModel.addComment(UpdateType.PATCH, element);
-  };
-
   #addPopup = () => {
     render(this.#popupComponent, this.#elementComponent);
     this.#elementComponent.classList.add('hide-overflow');
     this.#setHandlers();
-    this.#renderCommentList(this.#comments);
+    this.#renderCommentList(this.comments);
   };
 
   #removePopup = () => {
@@ -121,6 +123,6 @@ export default class PopupPresenter {
 
   #onCardControlClick = (listName) => {
     this.#changeData(listName);
-    this.#renderCommentList(this.#comments);
+    this.#renderCommentList(this.comments);
   };
 }

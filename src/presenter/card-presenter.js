@@ -25,7 +25,7 @@ export default class CardPresenter {
   init = (card, commentModel) => {
     this.#card = card;
     this.#commentModel = commentModel;
-    this.#commentModel.addObserver(this.#onCommentAddEvent);
+    this.#commentModel.addObserver(this.#onCommentAction);
 
     const prevCardComponent = this.#cardComponent;
 
@@ -68,7 +68,7 @@ export default class CardPresenter {
   };
 
   destroy = () => {
-    this.#commentModel.removeObserver(this.#onCommentAddEvent);
+    this.#commentModel.removeObserver(this.#onCommentAction);
     remove(this.#cardComponent);
   };
 
@@ -95,13 +95,25 @@ export default class CardPresenter {
     this.#popupPresentor.init(this.#card, this.#commentModel);
   };
 
-  #onCommentAddEvent = (updateType, data) => {
-    if (data.cardId === this.#card.id) {
-      this.#changeData(
-        UserAction.UPDATE_CARD,
-        updateType,
-        {...this.#card, comments: this.#card.comments.add(data.id)},
-      );
+  #onCommentAction = (updateType, update) => {
+    if (update.cardId !== undefined) {
+      if (update.cardId === this.#card.id) {
+        this.#changeData(
+          UserAction.UPDATE_CARD,
+          updateType,
+          {...this.#card, comments: this.#card.comments.add(update.id)},
+        );
+      }
+    } else {
+      const hasComment = this.#card.comments.has(update.id);
+      if (hasComment) {
+        this.#card.comments.delete(update.id);
+        this.#changeData(
+          UserAction.UPDATE_CARD,
+          updateType,
+          {...this.#card, comments: this.#card.comments},
+        );
+      }
     }
   };
 

@@ -1,5 +1,6 @@
 import {render, remove, replace} from '../framework/render.js';
 import NewCommentView from '../view/comment-view.js';
+import {UpdateType} from '../const.js';
 
 export default class CommentPresenter {
   #component = null;
@@ -21,11 +22,13 @@ export default class CommentPresenter {
 
     if (prevCommentComponent === null) {
       render(this.#commentComponent, this.#component);
+      this.#setHandlers();
       return;
     }
 
     if (this.#component.contains(prevCommentComponent.element)) {
       replace(this.#commentComponent, prevCommentComponent);
+      this.#setHandlers();
     }
 
     remove(prevCommentComponent);
@@ -33,5 +36,14 @@ export default class CommentPresenter {
 
   destroy = () => {
     remove(this.#commentComponent);
+  };
+
+  #setHandlers = () => {
+    this.#commentComponent.setDeleteHandler(this.#onDeleteComment);
+  };
+
+  #onDeleteComment = (data) => {
+    this.#commentModel.deleteComment(UpdateType.PATCH, data);
+    this.destroy();
   };
 }
