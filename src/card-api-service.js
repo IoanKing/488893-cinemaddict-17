@@ -5,7 +5,7 @@ const Method = {
   PUT: 'PUT',
 };
 
-export default class CardApiService extends ApiService {
+export default class CardsApiService extends ApiService {
   get movies() {
     return this._load({url: 'movies'})
       .then(ApiService.parseResponse);

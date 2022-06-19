@@ -4,11 +4,25 @@ import Observable from '../framework/observable.js';
 export default class CardModel extends Observable {
   #comments = null;
   #cards = null;
+  #cardsApiService = null;
 
-  constructor(comments) {
+  // constructor(comments) {
+  //   super();
+  //   this.comments = comments;
+  //   this.#cards = Array.from({length: 26}, () => generateCard(this.comments));
+  // }
+
+  constructor(cardsApiService) {
     super();
-    this.comments = comments;
-    this.#cards = Array.from({length: 26}, () => generateCard(this.comments));
+    this.#cardsApiService = cardsApiService;
+
+    this.#cardsApiService.movies.then((cards) => {
+      console.log(cards);
+      // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
+      // а ещё на сервере используется snake_case, а у нас camelCase.
+      // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
+      // Есть вариант получше - паттерн "Адаптер"
+    });
   }
 
   get cards() {
