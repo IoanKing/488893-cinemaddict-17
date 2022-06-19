@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import dayjsRandom from 'dayjs-random';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import {Setting} from '../const.js';
 
 dayjs.extend(dayjsRandom);
 dayjs.extend(duration);
@@ -167,6 +168,13 @@ const debounce = (cb, timeoutDelay = DEBOUNCE_TIME) => {
   };
 };
 
+/**
+ * Обрезка текста более заданого количества символов.
+ * @param {string} text - Исходный текст.
+ * @returns - Обрезанный текст.
+ */
+const getDescriptionShort = (text) => `${text.substring(0, Setting.MAX_TEXT_LENGTH)}${(text.length > Setting.MAX_TEXT_LENGTH) ? '...' : ''} `;
+
 export {
   getRandomNumber,
   getRandomFloat,
@@ -180,5 +188,6 @@ export {
   getCommentDate,
   onEscKeydown,
   onCtrlEnterKeydown,
-  debounce
+  debounce,
+  getDescriptionShort
 };
