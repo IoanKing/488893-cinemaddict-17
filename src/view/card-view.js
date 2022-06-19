@@ -9,7 +9,7 @@ import {getYearDate, getHumanReadableTime, getDescriptionShort} from '../utils/u
 const createCardTemplate = (data) => {
   const {title, totalRating, poster, description, genre, runtime, release} = data.filmInfo;
   const {watchlist, isAlreadyWatched, favorite} = data.userDetails;
-  const commentCount = data.comments.size;
+  const commentCount = data.comments.length;
 
   const watchListClassName = watchlist
     ? 'film-card__controls-item--active'
@@ -32,7 +32,7 @@ const createCardTemplate = (data) => {
         <span class="film-card__duration">${getHumanReadableTime(runtime)}</span>
         <span class="film-card__genre">${genre.join(', ')}</span>
       </p>
-      <img src="./images/posters/${poster}" alt="" class="film-card__poster">
+      <img src="${poster}" alt="" class="film-card__poster">
       <p class="film-card__description">${getDescriptionShort(description)}</p>
       <span class="film-card__comments">${commentCount} comments</span>
     </a>

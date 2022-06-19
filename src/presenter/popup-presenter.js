@@ -8,6 +8,7 @@ export default class PopupPresenter {
   #commentModel = null;
   #card = null;
   #cardModel = null;
+  #comments = null;
 
   #elementComponent = null;
   #popupComponent = null;
@@ -19,6 +20,7 @@ export default class PopupPresenter {
     this.#commentModel = commentModel;
     this.#cardModel = cardModel;
     this.#commentModel.addObserver(this.#renderCommentList);
+    console.log(this.#commentModel.comments);
   }
 
   get card() {
@@ -29,20 +31,17 @@ export default class PopupPresenter {
     return this.#popupComponent;
   }
 
-  get comments() {
-    return this.#commentModel.comments.filter((values) => this.card.comments.has(values.id));
-  }
-
   get commentListComponent() {
     return this.#popupComponent.element.querySelector('.film-details__comments-list');
   }
 
   init = (card) => {
     this.#card = card;
+    this.#commentModel.init(card);
 
     const prevPopupComponent = this.#popupComponent;
 
-    this.#popupComponent = new NewPopupView(this.card, this.comments, this.#onEmotionClick);
+    this.#popupComponent = new NewPopupView(this.card, this.#commentModel, this.#onEmotionClick);
 
     if (prevPopupComponent === null) {
       this.#addPopup();
@@ -80,12 +79,18 @@ export default class PopupPresenter {
     this.#setHandlers();
   };
 
-  #renderCommentList = () => {
-    if (this.#commentPresentor !== null) {
-      this.#commentPresentor.forEach((presenter) => presenter.destroy());
-      this.#commentPresentor.clear();
+  #renderCommentList = (updateType) => {
+    switch (updateType) {
+      case UpdateType.INIT:
+        this.init();
+        break;
+      default:
+        if (this.#commentPresentor !== null) {
+          this.#commentPresentor.forEach((presenter) => presenter.destroy());
+          this.#commentPresentor.clear();
+        }
+        this.#comments.forEach((comment) => this.#renderComment(comment));
     }
-    this.comments.forEach((comment) => this.#renderComment(comment));
   };
 
   #setHandlers = () => {

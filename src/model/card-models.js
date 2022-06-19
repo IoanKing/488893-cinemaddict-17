@@ -1,29 +1,25 @@
-import {generateCard} from '../mock/movie.js';
 import Observable from '../framework/observable.js';
+import {UpdateType} from '../const.js';
 
 export default class CardModel extends Observable {
   #comments = null;
-  #cards = null;
+  #cards = [];
   #cardsApiService = null;
-
-  // constructor(comments) {
-  //   super();
-  //   this.comments = comments;
-  //   this.#cards = Array.from({length: 26}, () => generateCard(this.comments));
-  // }
 
   constructor(cardsApiService) {
     super();
     this.#cardsApiService = cardsApiService;
-
-    this.#cardsApiService.movies.then((cards) => {
-      console.log(cards);
-      // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
-      // а ещё на сервере используется snake_case, а у нас camelCase.
-      // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
-      // Есть вариант получше - паттерн "Адаптер"
-    });
   }
+
+  init = async () => {
+    try {
+      const cards = await this.#cardsApiService.movies;
+      this.#cards = cards.map(this.#adaptToClient);
+    } catch(err) {
+      this.#cards = [];
+    }
+    this._notify(UpdateType.INIT);
+  };
 
   get cards() {
     return this.#cards;
@@ -66,5 +62,39 @@ export default class CardModel extends Observable {
     ];
 
     this._notify(updateType);
+  };
+
+  #adaptToClient = (movie) => {
+    const adaptedCard = {...movie,
+      id: movie['id'],
+      userDetails: {
+        isAlreadyWatched: movie['user_details']['already_watched'],
+        watchingDate: movie['user_details']['watching_date'],
+        watchlist: movie['user_details']['watchlist'],
+        favorite: movie['user_details']['favorite']
+      },
+      filmInfo: {
+        title: movie['film_info']['title'],
+        alternativeTitle: movie['film_info']['alternative_title'],
+        totalRating: movie['film_info']['total_rating'],
+        poster: movie['film_info']['poster'],
+        ageRating: movie['film_info']['age_rating'],
+        director: movie['film_info']['director'],
+        writers: movie['film_info']['writers'],
+        actors: movie['film_info']['actors'],
+        release: {
+          date: movie['film_info']['release']['date'],
+          releaseCountry: movie['film_info']['release']['release_country']
+        },
+        runtime: movie['film_info']['reruntimelease'],
+        genre: movie['film_info']['genre'],
+        description: movie['film_info']['description']
+      }
+    };
+
+    delete adaptedCard['user_details'];
+    delete adaptedCard['film_info'];
+
+    return adaptedCard;
   };
 }

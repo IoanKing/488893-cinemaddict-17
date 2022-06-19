@@ -9,6 +9,7 @@ import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
 import {Setting, SortType, UpdateType, FilterType} from '../const.js';
 import {filter} from '../utils/filter.js';
+import LoadingView from '../view/loading-view.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -22,6 +23,7 @@ export default class BoardPresenter {
   #noCardComponent = null;
   #boardComponent = new NewBoardView();
   #cardListComponent = new NewCardListView();
+  #loadingComponent = new LoadingView();
 
   #cardComponent = new NewCardListContainerView();
 
@@ -29,6 +31,7 @@ export default class BoardPresenter {
   #showMoreButtonComponent = null;
   #renderedCardCount = 0;
   #filterType = FilterType.ALL;
+  #isLoading = true;
 
   constructor(boardContainer, cardModel, commentModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -64,9 +67,16 @@ export default class BoardPresenter {
   };
 
   #renderBoard = () => {
+    render(this.#boardComponent, this.#boardContainer);
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     const cards = this.cards;
     const cardCount = cards.length;
-    render(this.#boardComponent, this.#boardContainer);
+
     this.#renderCardListBlock();
     this.#renderSort();
 
@@ -89,6 +99,7 @@ export default class BoardPresenter {
     this.#cardPresenter.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
     remove(this.#noCardComponent);
     this.#showMoreButtonComponent.destroy();
 
@@ -135,6 +146,11 @@ export default class BoardPresenter {
         this.#clearBoard({resetRenderedCardCount: true, resetSortType: true});
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
 
@@ -142,6 +158,10 @@ export default class BoardPresenter {
     this.#sortComponent = new NewSortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#onSortTypeChange);
     render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
+  };
+
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
   };
 
   #renderNoCard = () => {

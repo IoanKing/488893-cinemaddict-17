@@ -61,7 +61,7 @@ const createEmotionTemplate = (emotion) => {
  * @param {object} data - Данные фильма.
  * @returns - Шаблон.
  */
-const createPopupTemplate = (data, comments) => {
+const createPopupTemplate = (data) => {
   const {commentText, emotionIcon, isWatchList, isWatched, isFavorite, card} = data;
   const {filmInfo} = card;
 
@@ -85,7 +85,7 @@ const createPopupTemplate = (data, comments) => {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="./images/posters/${filmInfo.poster}" alt="">
+            <img class="film-details__poster-img" src="${filmInfo.poster}" alt="">
 
             <p class="film-details__age">${filmInfo.ageRating}+</p>
           </div>
@@ -149,7 +149,7 @@ const createPopupTemplate = (data, comments) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count"></span></h3>
 
           <ul class="film-details__comments-list">
           </ul>
@@ -193,10 +193,10 @@ export default class NewPopupView extends AbstractStatefulView {
   #comments = null;
   #onEmotionChange = null;
 
-  constructor(card = BLANK_CARD, comments, onEmotionChange) {
+  constructor(card = BLANK_CARD, commentModel, onEmotionChange) {
     super();
     this._state = NewPopupView.parseCardToState(card);
-    this.#comments = comments;
+    this.#comments = commentModel.comments;
     this.#onEmotionChange = onEmotionChange;
     this.#setInnerHandlers();
   }
@@ -232,7 +232,7 @@ export default class NewPopupView extends AbstractStatefulView {
   };
 
   get template() {
-    return createPopupTemplate(this._state, this.#comments);
+    return createPopupTemplate(this._state);
   }
 
   get scrollPosition() {

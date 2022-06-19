@@ -8,18 +8,16 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import ProfilePresenter from './presenter/profile-presenter.js';
 import CardsApiService from './card-api-service.js';
 
-const AUTHORIZATION = 'Basic hS2sfS44wcl1sa2j';
+const AUTHORIZATION = 'Basic er893jdzbdw';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict/';
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteStatisticsElement = document.querySelector('.footer__statistics');
 
-const commentModel = new CommentModel();
 const filterModel = new FilterModel();
-// const commentIds = commentModel.comments.map((element) => element.id);
-// const cardModel = new CardModel(commentIds);
 const cardModel = new CardModel(new CardsApiService(END_POINT, AUTHORIZATION));
+const commentModel = new CommentModel(new CardsApiService(END_POINT, AUTHORIZATION));
 
 const profilePresenter = new ProfilePresenter(siteHeaderElement, cardModel);
 const filterPresentor = new FilterPresenter(siteMainElement, filterModel, cardModel);
@@ -28,5 +26,6 @@ const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentMod
 profilePresenter.init();
 filterPresentor.init();
 boardPresenter.init();
-
 render(new NewStatisticView(cardModel), siteStatisticsElement);
+cardModel.init();
+

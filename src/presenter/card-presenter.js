@@ -8,6 +8,7 @@ const bodyComponent = document.querySelector('body');
 export default class CardPresenter {
   #cardListContainer = null;
   #commentModel = null;
+  #comments = null;
   #card = null;
   #cardComponent = null;
   #cardModel = null;
@@ -73,30 +74,38 @@ export default class CardPresenter {
   };
 
   #renderPopup = (card) => {
+    this.#commentModel.init(card);
     this.#onPopupOpen();
     const popupPresenter = new PopupPresenter(bodyComponent, this.#cardModel, this.#commentModel);
+    this.#commentModel.init(card);
     popupPresenter.init(card);
 
     this.#popupPresentor = popupPresenter;
   };
 
   #onCommentAction = (updateType, update) => {
-    if (update.cardId !== undefined) {
-      if (update.cardId === this.#card.id) {
-        this.#cardModel.updateCard(
-          updateType,
-          {...this.#card, comments: this.#card.comments.add(update.id)},
-        );
-      }
-    } else {
-      const hasComment = this.#card.comments.has(update.id);
-      if (hasComment) {
-        this.#card.comments.delete(update.id);
-        this.#cardModel.updateCard(
-          updateType,
-          {...this.#card, comments: this.#card.comments},
-        );
-      }
+    switch (updateType) {
+      case UpdateType.INIT:
+        // this.#comments = this.#commentModel.comments;
+        break;
+      default:
+        if (update.cardId !== undefined) {
+          if (update.cardId === this.#card.id) {
+            this.#cardModel.updateCard(
+              updateType,
+              {...this.#card, comments: this.#card.comments.add(update.id)},
+            );
+          }
+        } else {
+          const hasComment = this.#card.comments.has(update.id);
+          if (hasComment) {
+            this.#card.comments.delete(update.id);
+            this.#cardModel.updateCard(
+              updateType,
+              {...this.#card, comments: this.#card.comments},
+            );
+          }
+        }
     }
   };
 
