@@ -1,35 +1,76 @@
-import NewFilterView from '../view/filter-view.js';
-import {render, RenderPosition, remove} from '../framework/render.js';
+import FilterView from '../view/filter-view.js';
+import {render, replace, remove} from '../framework/render.js';
+import {FilterType, UpdateType} from '../const.js';
+import {filter} from '../utils/filter.js';
 
 export default class FilterPresenter {
-  #data = null;
-  #container = null;
-  #watchlistCount = 0;
-  #historyCount = 0;
-  #favoritesCount = 0;
-  #component = null;
+  #cards = null;
+  #filterContainer = null;
+  #filterModel = null;
+  #cardModel = null;
+  #filterComponent = null;
 
-  constructor(container) {
-    this.#container = container;
+  constructor(filterContainer, filterModel, cardModel) {
+    this.#filterContainer = filterContainer;
+    this.#cardModel = cardModel;
+    this.#filterModel = filterModel;
+
+    this.#cardModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  init = (data) => {
-    this.#data = [...data];
+  get filters() {
+    const cards = [...this.#cardModel.cards];
 
-    this.#watchlistCount = this.#data.filter((values) => values.userDetails.watchlist).length;
-    this.#historyCount = this.#data.filter((values) => values.userDetails.isAlreadyWatched).length;
-    this.#favoritesCount = this.#data.filter((values) => values.userDetails.favorite).length;
+    return [
+      {
+        type: FilterType.ALL,
+        name: 'All movies',
+        count: filter[FilterType.ALL](cards).length,
+      },
+      {
+        type: FilterType.WATCHLIST,
+        name: 'Watchlist',
+        count: filter[FilterType.WATCHLIST](cards).length,
+      },
+      {
+        type: FilterType.HISTORY,
+        name: 'History',
+        count: filter[FilterType.HISTORY](cards).length,
+      },
+      {
+        type: FilterType.FAVORITE,
+        name: 'Favorites',
+        count: filter[FilterType.FAVORITE](cards).length,
+      },
+    ];
+  }
 
-    this.#renderFilters(this.#watchlistCount, this.#historyCount, this.#favoritesCount);
+  init = () => {
+    const filters = this.filters;
+    const prevFilterComponent = this.#filterComponent;
+
+    this.#filterComponent = new FilterView(filters, this.#filterModel.filter);
+    this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
+
+    if (prevFilterComponent === null) {
+      render(this.#filterComponent, this.#filterContainer);
+      return;
+    }
+
+    replace(this.#filterComponent, prevFilterComponent);
+    remove(prevFilterComponent);
   };
 
-  destroy() {
-    remove(this.#component);
-  }
+  #handleModelEvent = () => {
+    this.init();
+  };
 
-  #renderFilters = (watchlistCount, historyCount, favoritesCount) => {
-    this.#component = new NewFilterView(watchlistCount, historyCount, favoritesCount);
-    render(this.#component, this.#container, RenderPosition.BEFOREBEGIN);
+  #handleFilterTypeChange = (filterType) => {
+    if (this.#filterModel.filter === filterType) {
+      return;
+    }
+    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 
 }

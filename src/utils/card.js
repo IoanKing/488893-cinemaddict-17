@@ -1,19 +1,5 @@
 import dayjs from 'dayjs';
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
 const getWeightForNullDate = (dateA, dateB) => {
   if (dateA === null && dateB === null) {
     return 0;
@@ -42,4 +28,4 @@ const sortCardRate = (cardA, cardB) => {
   return weight ?? cardB.filmInfo.totalRating - cardA.filmInfo.totalRating;
 };
 
-export {updateItem, sortCardDate, sortCardRate};
+export {sortCardDate, sortCardRate};

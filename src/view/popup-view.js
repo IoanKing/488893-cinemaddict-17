@@ -2,11 +2,11 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {
   getHumanReadableTime,
   getHumanReadableDate,
-  getCommentDate,
   onCtrlEnterKeydown,
-  // debounce
+  debounce
 } from '../utils/utils.js';
 import {nanoid} from 'nanoid';
+import he from 'he';
 
 const BLANK_CARD = {
   id: null,
@@ -45,32 +45,6 @@ const createGenresTemplates = (genres) => {
   let result = '';
   for (const genre of genres) {
     result += `<span class="film-details__genre">${genre}</span>`;
-  }
-  return result;
-};
-
-/**
- * Получение шаблона комментариев.
- * @param {object} comments - Данные комментариев.
- * @returns - Шаблон.
- */
-const createCommentsTemplate = (comments) => {
-  let result = '';
-  for (const comm of comments) {
-    const {emotion, comment, author, date} = comm;
-    result += `<li class="film-details__comment">
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${comment}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${getCommentDate(date)}</span>
-        <button class="film-details__comment-delete">Delete</button>
-      </p>
-    </div>
-  </li>`;
   }
   return result;
 };
@@ -177,14 +151,13 @@ const createPopupTemplate = (data, comments) => {
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${createCommentsTemplate(comments)}
           </ul>
 
           <div class="film-details__new-comment">
             <div class="film-details__add-emoji-label">${createEmotionTemplate(emotionIcon)}</div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText}</textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(commentText)}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -217,11 +190,13 @@ const createPopupTemplate = (data, comments) => {
 
 export default class NewPopupView extends AbstractStatefulView {
   #comments = null;
+  #onEmotionChange = null;
 
-  constructor(card = BLANK_CARD, comments) {
+  constructor(card = BLANK_CARD, comments, onEmotionChange) {
     super();
     this._state = NewPopupView.parseCardToState(card);
     this.#comments = comments;
+    this.#onEmotionChange = onEmotionChange;
     this.#setInnerHandlers();
   }
 
@@ -237,12 +212,21 @@ export default class NewPopupView extends AbstractStatefulView {
       id: state.commentId,
       text: state.commentText,
       emotion: state.emotionIcon,
+      cardId: state.id
     };
     return newComment;
   };
 
   get template() {
     return createPopupTemplate(this._state, this.#comments);
+  }
+
+  get scrollPosition() {
+    return this.element.scrollTop;
+  }
+
+  set scrollPosition(position) {
+    this.element.scrollTop = position;
   }
 
   setScrollHandler = () => {
@@ -254,10 +238,10 @@ export default class NewPopupView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element
       .querySelectorAll('.film-details__emoji-item')
-      .forEach((element) => element.addEventListener('click', this.#onEmotionClick));
+      .forEach((element) => element.addEventListener('click', debounce(this.#onEmotionClick)));
     this.element
       .querySelector('.film-details__comment-input')
-      .addEventListener('input', this.#commentInputHandler);
+      .addEventListener('input', debounce(this.#commentInputHandler));
   };
 
   _restoreHandlers = () => {
@@ -268,10 +252,6 @@ export default class NewPopupView extends AbstractStatefulView {
   #commentInputHandler = (evt) => {
     evt.preventDefault();
     this._state.commentText = evt.target.value;
-    // debounce(() => {
-    //   this._state.commentText = evt.target.value;
-    //   console.log(this._state.commentText);
-    // });
   };
 
   setFormSubmitHandler = (callback) => {
@@ -290,6 +270,7 @@ export default class NewPopupView extends AbstractStatefulView {
       emotionIcon: evt.target.value,
       commentText: this._state.commentText
     });
+    this.#onEmotionChange();
     this.element.scrollTop = this._state.scrollPosition;
   };
 

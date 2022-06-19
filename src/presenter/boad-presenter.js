@@ -2,181 +2,196 @@ import NewBoardView from '../view/board-view.js';
 import NewCardListView from '../view/card-list-view.js';
 import NewSortView from '../view/sort-view.js';
 import NewCardListContainerView from '../view/card-list-container-view.js';
-import {render, RenderPosition} from '../framework/render.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
 import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
-import {updateItem, sortCardDate, sortCardRate} from '../utils/card.js';
+import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
-import FilterPresenter from './filter-presenter.js';
-import {Setting, SortType} from '../const.js';
+import {Setting, SortType, UpdateType, UserAction, FilterType} from '../const.js';
+import {filter} from '../utils/filter.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
-  #boardCards = [];
   #boardComments = [];
-  #movieModel = null;
+  #cardModel = null;
   #commentModel = null;
+  #filterModel = null;
 
   #cardPresenter = new Map();
   #currentSortType = SortType.DEFAULT;
-  #sourcedBoardCards = [];
-  #filterPresenter = null;
 
-  #sortComponent = new NewSortView();
-  #noCardComponent = new NoCardView();
+  #noCardComponent = null;
   #boardComponent = new NewBoardView();
   #cardListComponent = new NewCardListView();
 
   #cardComponent = new NewCardListContainerView();
 
+  #sortComponent = null;
   #showMoreButtonComponent = null;
   #renderedCardCount = 0;
+  #filterType = FilterType.ALL;
 
-  constructor(boardContainer, movieModel, commentModel) {
+  constructor(boardContainer, cardModel, commentModel, filterModel) {
     this.#boardContainer = boardContainer;
-    this.#movieModel = movieModel;
+    this.#cardModel = cardModel;
     this.#commentModel = commentModel;
+    this.#filterModel = filterModel;
+
+    this.#cardModel.addObserver(this.#onCardModelEvent);
+    this.#filterModel.addObserver(this.#onCardModelEvent);
+  }
+
+  get cards() {
+    this.#filterType = this.#filterModel.filter;
+    const cards = this.#cardModel.cards;
+    const filteredCards = filter[this.#filterType](cards);
+
+    switch (this.#currentSortType) {
+      case SortType.BY_DATE:
+        return filteredCards.sort(sortCardDate);
+      case SortType.BY_RATIO:
+        return filteredCards.sort(sortCardRate);
+    }
+    return filteredCards;
+  }
+
+  get comments() {
+    return [...this.#commentModel.comments];
   }
 
   init = () => {
-    this.#boardCards  = [...this.#movieModel.data];
-    this.#sourcedBoardCards = [...this.#movieModel.data];
-    this.#boardComments  = [...this.#commentModel.data];
-
-    this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
-
+    this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
     this.#renderBoard();
   };
 
   #renderBoard = () => {
+    const cards = this.cards;
+    const cardCount = cards.length;
     render(this.#boardComponent, this.#boardContainer);
-    this.#renderFilters();
     this.#renderCardListBlock();
-    this.#renderCardBlock();
     this.#renderSort();
 
-    if (this.#boardCards.length === 0) {
+    if (cardCount === 0) {
       this.#renderNoCard();
       return;
     }
 
-    this.#renderCardsList();
-  };
+    this.#renderCards(cards.slice(0, Math.min(cardCount, this.#renderedCardCount)), this.#cardComponent.element);
 
-  // ======= Фильтры =======
-
-  #renderFilters = () => {
-    this.#filterPresenter = new FilterPresenter(this.#boardContainer);
-    this.#filterPresenter.init(this.#boardCards);
-  };
-
-  // ======= Сортировка =======
-
-  #sortCards = (sortType) => {
-    switch (sortType) {
-      case SortType.BY_DATE:
-        this.#boardCards.sort(sortCardDate);
-        break;
-      case SortType.BY_RATIO:
-        this.#boardCards.sort(sortCardRate);
-        break;
-      default:
-        this.#boardCards = [...this.#sourcedBoardCards];
-    }
-
-    this.#currentSortType = sortType;
-  };
-
-  #handleSortTypeChange = (sortType) => {
-    if (this.#currentSortType === sortType) {
-      return;
-    }
-
-    this.#sortCards(sortType);
-    this.#clearCardsList();
-    this.#renderCardsList();
-  };
-
-  #renderSort = () => {
-    render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
-    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
-  };
-
-  // ======= Блоки с карточками =======
-
-  #renderCardListBlock = () => {
-    render(this.#cardListComponent, this.#boardComponent.element);
-  };
-
-  #renderCardBlock = () => {
-    render(this.#cardComponent, this.#cardListComponent.element);
-  };
-
-  // ======= Карточки фильмов =======
-
-  #renderNoCard = () => {
-    render(this.#noCardComponent, this.#cardComponent.element);
-  };
-
-  #renderCardsList = () => {
-    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + Setting.COUNT_LIST_MOVIES, this.#cardComponent.element);
-
-    this.#renderedCardCount += Setting.COUNT_LIST_MOVIES;
-
-    if (this.#boardCards.length > Setting.COUNT_LIST_MOVIES) {
+    if (cardCount > Setting.COUNT_LIST_MOVIES) {
       this.#renderShowMoreButton();
     }
   };
 
-  #clearCardsList = () => {
+  #clearBoard = ({resetRenderedCardCount = false, resetSortType = false} = {}) => {
+    const cardCount = this.cards.length;
+
     this.#cardPresenter.forEach((presenter) => presenter.destroy());
     this.#cardPresenter.clear();
-    this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
+
+    remove(this.#sortComponent);
+    remove(this.#noCardComponent);
     this.#showMoreButtonComponent.destroy();
+
+    if (this.#noCardComponent) {
+      remove(this.#noCardComponent);
+    }
+
+    if (resetRenderedCardCount) {
+      this.#renderedCardCount = Setting.COUNT_LIST_MOVIES;
+    } else {
+      this.#renderedCardCount = Math.min(cardCount, this.#renderedCardCount);
+    }
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
   };
 
-  #renderCard = (card, elementComponent, comments) => {
-    const cardPresenter = new CardPresenter(elementComponent, this.#onCardChange, this.#onPopupOpend, this.#onCommentAdded);
+  #renderCardListBlock = () => {
+    render(this.#cardListComponent, this.#boardComponent.element);
+    render(this.#cardComponent, this.#cardListComponent.element);
+  };
+
+  #onSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#currentSortType = sortType;
+    this.#clearBoard({resetRenderedCardCount: true});
+    this.#renderBoard();
+  };
+
+  #onViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case UserAction.UPDATE_CARD:
+        this.#cardModel.updateCard(updateType, update);
+        break;
+      case UserAction.ADD_CARD:
+        this.#cardModel.addCard(updateType, update);
+        break;
+      case UserAction.DELETE_CARD:
+        this.#cardModel.deleteCard(updateType, update);
+        break;
+    }
+  };
+
+  #onCardModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#cardPresenter.get(data.id).init(data, this.#commentModel);
+        break;
+      case UpdateType.MINOR:
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearBoard({resetRenderedCardCount: true, resetSortType: true});
+        this.#renderBoard();
+        break;
+    }
+  };
+
+  #renderSort = () => {
+    this.#sortComponent = new NewSortView(this.#currentSortType);
+    this.#sortComponent.setSortTypeChangeHandler(this.#onSortTypeChange);
+    render(this.#sortComponent, this.#cardComponent.element, RenderPosition.BEFOREBEGIN);
+  };
+
+  #renderNoCard = () => {
+    this.#noCardComponent = new NoCardView(this.#filterType);
+    render(this.#noCardComponent, this.#cardComponent.element);
+  };
+
+  #renderCard = (card, component, comments) => {
+    const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend);
     cardPresenter.init(card, comments);
     this.#cardPresenter.set(card.id, cardPresenter);
   };
 
-  #onCardChange = (updatedCard) => {
-    this.#boardCards = updateItem(this.#boardCards, updatedCard);
-    this.#sourcedBoardCards = updateItem(this.#boardCards, updatedCard);
-    const currentCard = this.#cardPresenter.get(updatedCard.id);
-    currentCard.init(updatedCard, this.#boardComments);
-    this.#filterPresenter.destroy();
-    this.#renderFilters();
-  };
-
-  #renderCards = (from, to, elementComponent) => {
-    this.#boardCards
-      .slice(from, to)
-      .forEach((card) => this.#renderCard(card, elementComponent, this.#boardComments));
+  #renderCards = (cards, component) => {
+    cards.forEach((card) => this.#renderCard(card, component, this.#commentModel));
   };
 
   #onPopupOpend = () => {
     this.#cardPresenter.forEach((presenter) => presenter.resetPopup());
   };
 
-  #onCommentAdded = (element) => {
-    this.#commentModel.data = element;
-    this.#boardComments  = [...this.#commentModel.data];
-  };
-
-  // ======= Кнопка Show more =======
-
   #renderShowMoreButton = () => {
+    this.#showMoreButtonComponent = new ShowButtonPresenter(this.#boardComponent.element);
     this.#showMoreButtonComponent.init(this.#onShowMoreButtonClick);
   };
 
   #onShowMoreButtonClick = () => {
-    this.#renderCards(this.#renderedCardCount, this.#renderedCardCount + Setting.COUNT_LIST_MOVIES, this.#cardComponent.element);
+    const cardCount = this.cards.length;
+    const newRenderedCardCount = Math.min(cardCount, this.#renderedCardCount + Setting.COUNT_LIST_MOVIES);
+    const cards = this.cards.slice(this.#renderedCardCount, newRenderedCardCount);
 
-    this.#renderedCardCount += Setting.COUNT_LIST_MOVIES;
+    this.#renderCards(cards, this.#cardComponent.element);
+    this.#renderedCardCount = newRenderedCardCount;
 
-    if (this.#renderedCardCount >= this.#boardCards.length) {
+    if (this.#renderedCardCount >= cardCount) {
       this.#showMoreButtonComponent.destroy();
     }
   };

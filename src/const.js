@@ -17,4 +17,21 @@ const SortType = {
   BY_RATIO: 'ratio',
 };
 
-export {Setting, FilterType, SortType};
+const UserAction = {
+  UPDATE_CARD: 'UPDATE_CARD',
+  ADD_CARD: 'ADD_CARD',
+  DELETE_CARD: 'DELETE_CARD',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const CommentAction = {
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+export {Setting, FilterType, SortType, UserAction, UpdateType, CommentAction};

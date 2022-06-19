@@ -1,12 +1,13 @@
 import NewCardView from '../view/card-view.js';
 import {render, replace, remove} from '../framework/render.js';
 import PopupPresenter from './popup-presenter.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const bodyComponent = document.querySelector('body');
 
 export default class CardPresenter {
   #cardListContainer = null;
-  #comments = null;
+  #commentModel = null;
   #card = null;
   #cardComponent = null;
   #changeData = null;
@@ -14,18 +15,17 @@ export default class CardPresenter {
 
   #popupPresentor = null;
   #onPopupOpen = false;
-  #onCommentAdded = null;
 
-  constructor(cardListContainer, changeData, onPopupOpen, onCommentAdded) {
+  constructor(cardListContainer, changeData, onPopupOpen) {
     this.#cardListContainer = cardListContainer;
     this.#changeData = changeData;
     this.#onPopupOpen = onPopupOpen;
-    this.#onCommentAdded = onCommentAdded;
   }
 
-  init = (card, comments) => {
+  init = (card, commentModel) => {
     this.#card = card;
-    this.#comments = comments.filter((values) => this.#card.comments.has(values.id));
+    this.#commentModel = commentModel;
+    this.#commentModel.addObserver(this.#onCommentAction);
 
     const prevCardComponent = this.#cardComponent;
 
@@ -57,7 +57,7 @@ export default class CardPresenter {
   };
 
   #popupClickHandler = () => {
-    this.#renderPopup(this.#card, this.#comments);
+    this.#renderPopup(this.#card, this.#commentModel);
   };
 
   resetPopup = () => {
@@ -68,12 +68,13 @@ export default class CardPresenter {
   };
 
   destroy = () => {
+    this.#commentModel.removeObserver(this.#onCommentAction);
     remove(this.#cardComponent);
   };
 
   #renderPopup = (card, comments) => {
     this.#onPopupOpen();
-    const popupPresenter = new PopupPresenter(bodyComponent, this.#onPopupChange, this.#onCommentAdd);
+    const popupPresenter = new PopupPresenter(bodyComponent, this.#onPopupChange);
     popupPresenter.init(card, comments);
 
     this.#popupPresentor = popupPresenter;
@@ -91,32 +92,60 @@ export default class CardPresenter {
         this.#onWatchedClick();
         break;
     }
+    this.#popupPresentor.init(this.#card, this.#commentModel);
   };
 
-  #onCommentAdd = (element) => {
-    this.#onCommentAdded(element);
-    this.#changeData({...this.#card, comments: this.#card.comments.add(element.id)});
+  #onCommentAction = (updateType, update) => {
+    if (update.cardId !== undefined) {
+      if (update.cardId === this.#card.id) {
+        this.#changeData(
+          UserAction.UPDATE_CARD,
+          updateType,
+          {...this.#card, comments: this.#card.comments.add(update.id)},
+        );
+      }
+    } else {
+      const hasComment = this.#card.comments.has(update.id);
+      if (hasComment) {
+        this.#card.comments.delete(update.id);
+        this.#changeData(
+          UserAction.UPDATE_CARD,
+          updateType,
+          {...this.#card, comments: this.#card.comments},
+        );
+      }
+    }
   };
 
   #onWathlistClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      watchlist: !this.#card.userDetails.watchlist
-    }});
+    this.#changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.MINOR,
+      {...this.#card, userDetails: {
+        ...this.#card.userDetails,
+        watchlist: !this.#card.userDetails.watchlist
+      }},
+    );
   };
 
   #onFavoriteClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      favorite: !this.#card.userDetails.favorite
-    }});
+    this.#changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.MINOR,
+      {...this.#card, userDetails: {
+        ...this.#card.userDetails,
+        favorite: !this.#card.userDetails.favorite
+      }});
   };
 
   #onWatchedClick = () => {
-    this.#changeData({...this.#card, userDetails: {
-      ...this.#card.userDetails,
-      isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
-      watchingDate: new Date().toUTCString(),
-    }});
+    this.#changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.MINOR,
+      {...this.#card, userDetails: {
+        ...this.#card.userDetails,
+        isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
+        watchingDate: new Date().toUTCString(),
+      }});
   };
 }

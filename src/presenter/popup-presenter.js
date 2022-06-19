@@ -1,28 +1,31 @@
 import {render, remove, replace} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
 import {onEscKeydown} from '../utils/utils.js';
+import CommentPresenter from '../presenter/comment-presenter.js';
+import {UpdateType} from '../const.js';
 
 export default class PopupPresenter {
-  #comments = null;
+  #commentModel = null;
   #card = null;
   #changeData = null;
 
   #elementComponent = null;
   #popupComponent = null;
-  #commentAdd = null;
+  #position = 0;
+  #commentPresentor = new Map();
 
-  constructor(elementComponent, changeData, commentAdd) {
+  constructor(elementComponent, changeData) {
     this.#elementComponent = elementComponent;
     this.#changeData = changeData;
-    this.#commentAdd = commentAdd;
   }
 
-  init = (card, comments) => {
+  init = (card, commentModel) => {
     this.#card = card;
-    this.#comments = comments;
+    this.#commentModel = commentModel;
+    this.#commentModel.addObserver(this.#renderCommentList);
 
     const prevPopupComponent = this.#popupComponent;
-    this.#popupComponent = new NewPopupView(this.#card, this.#comments);
+    this.#popupComponent = new NewPopupView(this.#card, this.comments, this.#onEmotionClick);
 
     if (prevPopupComponent === null) {
       this.#addPopup();
@@ -31,7 +34,9 @@ export default class PopupPresenter {
     }
 
     if (this.#elementComponent.contains(prevPopupComponent.element)) {
+      this.#position = prevPopupComponent.scrollPosition;
       replace(this.#popupComponent, prevPopupComponent);
+      this.#popupComponent.scrollPosition = this.#position;
       this.#setHandlers();
     }
 
@@ -42,8 +47,40 @@ export default class PopupPresenter {
     return this.#popupComponent;
   }
 
+  get comments() {
+    return this.#commentModel.comments.filter((values) => this.#card.comments.has(values.id));
+  }
+
+  get commentListComponent() {
+    return this.#popupComponent.element.querySelector('.film-details__comments-list');
+  }
+
   destroy = () => {
     this.#removePopup();
+  };
+
+  #renderComment = (comment) => {
+    const commentsPresenter = new CommentPresenter(this.commentListComponent);
+    commentsPresenter.init(comment, this.#commentModel);
+
+    this.#commentPresentor.set(comment.id, commentsPresenter);
+  };
+
+  #onCommentAdd = (data) => {
+    this.#commentModel.addComment(UpdateType.PATCH, data);
+  };
+
+  #onEmotionClick = () => {
+    this.#renderCommentList();
+    this.#setHandlers();
+  };
+
+  #renderCommentList = () => {
+    if (this.#commentPresentor !== null) {
+      this.#commentPresentor.forEach((presenter) => presenter.destroy());
+      this.#commentPresentor.clear();
+    }
+    this.comments.forEach((comment) => this.#renderComment(comment));
   };
 
   #setHandlers = () => {
@@ -56,7 +93,7 @@ export default class PopupPresenter {
   };
 
   #onSubmit = (element) => {
-    this.#commentAdd(element);
+    this.#onCommentAdd(element);
     this.#removePopup();
   };
 
@@ -64,6 +101,7 @@ export default class PopupPresenter {
     render(this.#popupComponent, this.#elementComponent);
     this.#elementComponent.classList.add('hide-overflow');
     this.#setHandlers();
+    this.#renderCommentList(this.comments);
   };
 
   #removePopup = () => {
@@ -85,5 +123,6 @@ export default class PopupPresenter {
 
   #onCardControlClick = (listName) => {
     this.#changeData(listName);
+    this.#renderCommentList(this.comments);
   };
 }
