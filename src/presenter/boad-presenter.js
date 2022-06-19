@@ -7,12 +7,11 @@ import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {sortCardDate, sortCardRate} from '../utils/card.js';
 import ShowButtonPresenter from './showbutton-presenter.js';
-import {Setting, SortType, UpdateType, UserAction, FilterType} from '../const.js';
+import {Setting, SortType, UpdateType, FilterType} from '../const.js';
 import {filter} from '../utils/filter.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
-  #boardComments = [];
   #cardModel = null;
   #commentModel = null;
   #filterModel = null;
@@ -123,24 +122,10 @@ export default class BoardPresenter {
     this.#renderBoard();
   };
 
-  #onViewAction = (actionType, updateType, update) => {
-    switch (actionType) {
-      case UserAction.UPDATE_CARD:
-        this.#cardModel.updateCard(updateType, update);
-        break;
-      case UserAction.ADD_CARD:
-        this.#cardModel.addCard(updateType, update);
-        break;
-      case UserAction.DELETE_CARD:
-        this.#cardModel.deleteCard(updateType, update);
-        break;
-    }
-  };
-
   #onCardModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#cardPresenter.get(data.id).init(data, this.#commentModel);
+        this.#cardPresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
@@ -164,14 +149,14 @@ export default class BoardPresenter {
     render(this.#noCardComponent, this.#cardComponent.element);
   };
 
-  #renderCard = (card, component, comments) => {
-    const cardPresenter = new CardPresenter(component, this.#onViewAction, this.#onPopupOpend);
-    cardPresenter.init(card, comments);
+  #renderCard = (card, component) => {
+    const cardPresenter = new CardPresenter(component, this.#cardModel, this.#commentModel, this.#onPopupOpend);
+    cardPresenter.init(card);
     this.#cardPresenter.set(card.id, cardPresenter);
   };
 
   #renderCards = (cards, component) => {
-    cards.forEach((card) => this.#renderCard(card, component, this.#commentModel));
+    cards.forEach((card) => this.#renderCard(card, component));
   };
 
   #onPopupOpend = () => {

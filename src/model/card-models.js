@@ -27,7 +27,6 @@ export default class CardModel extends Observable {
       update,
       ...this.#cards.slice(index + 1),
     ];
-
     this._notify(updateType, update);
   };
 

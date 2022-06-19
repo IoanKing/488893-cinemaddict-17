@@ -62,17 +62,18 @@ const createEmotionTemplate = (emotion) => {
  * @returns - Шаблон.
  */
 const createPopupTemplate = (data, comments) => {
-  const {filmInfo, userDetails, commentText, emotionIcon} = data;
+  const {commentText, emotionIcon, isWatchList, isWatched, isFavorite, card} = data;
+  const {filmInfo} = card;
 
-  const watchListClassName = userDetails.watchlist
+  const watchListClassName = isWatchList
     ? 'film-details__control-button--active'
     : '';
 
-  const watchedClassName  = userDetails.isAlreadyWatched
+  const watchedClassName  = isWatched
     ? 'film-details__control-button--active'
     : '';
 
-  const favoriteClassName  = userDetails.favorite
+  const favoriteClassName  = isFavorite
     ? 'film-details__control-button--active'
     : '';
 
@@ -200,11 +201,15 @@ export default class NewPopupView extends AbstractStatefulView {
     this.#setInnerHandlers();
   }
 
-  static parseCardToState = (card) => ({...card,
+  static parseCardToState = (data) => ({
+    card: {...data},
     scrollPosition: 0,
     commentId: nanoid(),
     emotionIcon: null,
-    commentText: ''
+    commentText: '',
+    isWatchList: data.userDetails.watchlist,
+    isWatched: data.userDetails.isAlreadyWatched,
+    isFavorite: data.userDetails.favorite
   });
 
   static parseStateToComment = (state) => {
@@ -212,9 +217,18 @@ export default class NewPopupView extends AbstractStatefulView {
       id: state.commentId,
       text: state.commentText,
       emotion: state.emotionIcon,
-      cardId: state.id
+      cardId: state.card.id
     };
     return newComment;
+  };
+
+  static parseStateToCard = (state) => {
+    const updatedCard = {...state};
+    delete updatedCard.scrollPosition;
+    delete updatedCard.commentId;
+    delete updatedCard.emotionIcon;
+    delete updatedCard.commentText;
+    return updatedCard;
   };
 
   get template() {
@@ -267,8 +281,8 @@ export default class NewPopupView extends AbstractStatefulView {
   #onEmotionClick = (evt) => {
     evt.preventDefault();
     this.updateElement({
-      emotionIcon: evt.target.value,
-      commentText: this._state.commentText
+      ...this._state,
+      emotionIcon: evt.target.value
     });
     this.#onEmotionChange();
     this.element.scrollTop = this._state.scrollPosition;
@@ -303,16 +317,31 @@ export default class NewPopupView extends AbstractStatefulView {
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchlistClick();
+    this.updateElement({
+      ...this._state,
+      isWatchList: !this._state.isWatchList
+    });
+    this.element.scrollTop = this._state.scrollPosition;
+    this._callback.watchlistClick(NewPopupView.parseStateToCard(this._state));
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.favoriteClick();
+    this.updateElement({
+      ...this._state,
+      isFavorite: !this._state.isFavorite
+    });
+    this.element.scrollTop = this._state.scrollPosition;
+    this._callback.favoriteClick(NewPopupView.parseStateToCard(this._state));
   };
 
   #wathcedClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchedClick();
+    this.updateElement({
+      ...this._state,
+      isWatched: !this._state.isWatched
+    });
+    this.element.scrollTop = this._state.scrollPosition;
+    this._callback.watchedClick(NewPopupView.parseStateToCard(this._state));
   };
 }

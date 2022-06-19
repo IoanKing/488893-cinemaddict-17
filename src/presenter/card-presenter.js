@@ -1,7 +1,7 @@
 import NewCardView from '../view/card-view.js';
 import {render, replace, remove} from '../framework/render.js';
 import PopupPresenter from './popup-presenter.js';
-import {UserAction, UpdateType} from '../const.js';
+import {UpdateType} from '../const.js';
 
 const bodyComponent = document.querySelector('body');
 
@@ -10,22 +10,22 @@ export default class CardPresenter {
   #commentModel = null;
   #card = null;
   #cardComponent = null;
-  #changeData = null;
+  #cardModel = null;
   _callback = {};
 
   #popupPresentor = null;
   #onPopupOpen = false;
 
-  constructor(cardListContainer, changeData, onPopupOpen) {
+  constructor(cardListContainer, cardModel, commentModel, onPopupOpen) {
     this.#cardListContainer = cardListContainer;
-    this.#changeData = changeData;
+    this.#commentModel = commentModel;
     this.#onPopupOpen = onPopupOpen;
+    this.#cardModel = cardModel;
+    this.#commentModel.addObserver(this.#onCommentAction);
   }
 
-  init = (card, commentModel) => {
+  init = (card) => {
     this.#card = card;
-    this.#commentModel = commentModel;
-    this.#commentModel.addObserver(this.#onCommentAction);
 
     const prevCardComponent = this.#cardComponent;
 
@@ -46,18 +46,18 @@ export default class CardPresenter {
   };
 
   get card() {
-    return this.#card;
+    return this.#cardModel.cards.find((element) => this.#card.id === element.id);
   }
 
   #setHandlers = () => {
     this.#cardComponent.setEditClickHandler(this.#popupClickHandler);
-    this.#cardComponent.setWatchlistClickHandler(this.#onWathlistClick);
-    this.#cardComponent.setFavoriteClickHandler(this.#onFavoriteClick);
-    this.#cardComponent.setWatchedClickHandler(this.#onWatchedClick);
+    this.#cardComponent.setWatchlistClickHandler(() => this.#onControlActionClick('watchlist'));
+    this.#cardComponent.setFavoriteClickHandler(() => this.#onControlActionClick('favorite'));
+    this.#cardComponent.setWatchedClickHandler(() => this.#onControlActionClick('watched'));
   };
 
   #popupClickHandler = () => {
-    this.#renderPopup(this.#card, this.#commentModel);
+    this.#renderPopup(this.#card);
   };
 
   resetPopup = () => {
@@ -72,34 +72,18 @@ export default class CardPresenter {
     remove(this.#cardComponent);
   };
 
-  #renderPopup = (card, comments) => {
+  #renderPopup = (card) => {
     this.#onPopupOpen();
-    const popupPresenter = new PopupPresenter(bodyComponent, this.#onPopupChange);
-    popupPresenter.init(card, comments);
+    const popupPresenter = new PopupPresenter(bodyComponent, this.#cardModel, this.#commentModel);
+    popupPresenter.init(card);
 
     this.#popupPresentor = popupPresenter;
-  };
-
-  #onPopupChange = (targetClick) => {
-    switch (targetClick) {
-      case ('watchlist'):
-        this.#onWathlistClick();
-        break;
-      case ('favorite'):
-        this.#onFavoriteClick();
-        break;
-      case ('watched'):
-        this.#onWatchedClick();
-        break;
-    }
-    this.#popupPresentor.init(this.#card, this.#commentModel);
   };
 
   #onCommentAction = (updateType, update) => {
     if (update.cardId !== undefined) {
       if (update.cardId === this.#card.id) {
-        this.#changeData(
-          UserAction.UPDATE_CARD,
+        this.#cardModel.updateCard(
           updateType,
           {...this.#card, comments: this.#card.comments.add(update.id)},
         );
@@ -108,8 +92,7 @@ export default class CardPresenter {
       const hasComment = this.#card.comments.has(update.id);
       if (hasComment) {
         this.#card.comments.delete(update.id);
-        this.#changeData(
-          UserAction.UPDATE_CARD,
+        this.#cardModel.updateCard(
           updateType,
           {...this.#card, comments: this.#card.comments},
         );
@@ -117,35 +100,24 @@ export default class CardPresenter {
     }
   };
 
-  #onWathlistClick = () => {
-    this.#changeData(
-      UserAction.UPDATE_CARD,
+  #onControlActionClick = (controlAction) => {
+    const watchlistDetail = (controlAction === 'watchlist') ? !this.#card.userDetails.watchlist : this.#card.userDetails.watchlist;
+
+    const isAlreadyWatchedDetail = (controlAction === 'watched') ? !this.#card.userDetails.isAlreadyWatched : this.#card.userDetails.isAlreadyWatched;
+
+    const watchingDateDetail = (controlAction === 'watched') ? new Date().toUTCString() : this.#card.userDetails.watchingDate;
+
+    const favoriteDetail = (controlAction === 'favorite') ? !this.#card.userDetails.favorite : this.#card.userDetails.favorite;
+
+    this.#cardModel.updateCard(
       UpdateType.MINOR,
       {...this.#card, userDetails: {
         ...this.#card.userDetails,
-        watchlist: !this.#card.userDetails.watchlist
+        watchlist: watchlistDetail,
+        isAlreadyWatched: isAlreadyWatchedDetail,
+        watchingDate: watchingDateDetail,
+        favorite: favoriteDetail,
       }},
     );
-  };
-
-  #onFavoriteClick = () => {
-    this.#changeData(
-      UserAction.UPDATE_CARD,
-      UpdateType.MINOR,
-      {...this.#card, userDetails: {
-        ...this.#card.userDetails,
-        favorite: !this.#card.userDetails.favorite
-      }});
-  };
-
-  #onWatchedClick = () => {
-    this.#changeData(
-      UserAction.UPDATE_CARD,
-      UpdateType.MINOR,
-      {...this.#card, userDetails: {
-        ...this.#card.userDetails,
-        isAlreadyWatched: !this.#card.userDetails.isAlreadyWatched,
-        watchingDate: new Date().toUTCString(),
-      }});
   };
 }
