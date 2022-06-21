@@ -5,7 +5,6 @@ export default class ProfilePresenter {
   #cardModel = null;
   #profileComponent = null;
   #parentComponent = null;
-  #profileComponents = null;
 
   constructor(component, cardModel) {
     this.#cardModel = cardModel;
