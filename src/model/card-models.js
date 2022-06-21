@@ -9,11 +9,16 @@ export default class CardModel extends Observable {
   constructor(cardsApiService) {
     super();
     this.#cardsApiService = cardsApiService;
+
+    this.#cardsApiService.cards.then((cards) => {
+      console.log("Исходный массив фильмов", cards);
+      console.log("Адаптированный массив", cards.map(this.#adaptToClient));
+    });
   }
 
   init = async () => {
     try {
-      const cards = await this.#cardsApiService.movies;
+      const cards = await this.#cardsApiService.cards;
       this.#cards = cards.map(this.#adaptToClient);
     } catch(err) {
       this.#cards = [];

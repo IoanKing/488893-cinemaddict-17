@@ -1,8 +1,9 @@
-import {render, remove, replace} from '../framework/render.js';
+import {render, remove, replace, RenderPosition} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
 import {onEscKeydown} from '../utils/utils.js';
 import CommentPresenter from '../presenter/comment-presenter.js';
 import {UpdateType} from '../const.js';
+import LoadingView from '../view/loading-view.js';
 
 export default class PopupPresenter {
   #commentModel = null;
@@ -13,6 +14,8 @@ export default class PopupPresenter {
   #popupComponent = null;
   #position = 0;
   #commentPresentor = new Map();
+  #loadingComponent = new LoadingView();
+  #isLoading = true;
 
   constructor(elementComponent, cardModel, commentModel) {
     this.#elementComponent = elementComponent;
@@ -80,12 +83,23 @@ export default class PopupPresenter {
   #onCommentAction = (updateType) => {
     switch (updateType) {
       case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderCommentList();
         break;
     }
   };
 
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.commentListComponent, RenderPosition.AFTERBEGIN);
+  };
+
   #renderCommentList = () => {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (this.#commentPresentor !== null) {
       this.#commentPresentor.forEach((presenter) => presenter.destroy());
       this.#commentPresentor.clear();
@@ -93,6 +107,7 @@ export default class PopupPresenter {
     if (this.#commentModel.comments !== null) {
       this.#commentModel.comments.forEach((comment) => this.#renderComment(comment));
     }
+    remove(this.#loadingComponent);
   };
 
   #setHandlers = () => {

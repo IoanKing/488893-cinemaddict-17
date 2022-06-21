@@ -6,7 +6,7 @@ const Method = {
 };
 
 export default class CardsApiService extends ApiService {
-  get movies() {
+  get cards() {
     return this._load({url: 'movies'})
       .then(ApiService.parseResponse);
   }

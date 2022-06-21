@@ -13,6 +13,7 @@ export default class CardPresenter {
   #cardComponent = null;
   #cardModel = null;
   _callback = {};
+  #isLoading = true;
 
   #popupPresentor = null;
   #onPopupOpen = false;
@@ -84,10 +85,9 @@ export default class CardPresenter {
 
   #onCommentAction = (updateType, update) => {
     switch (updateType) {
-      case UpdateType.INIT:
-        // this.#comments = this.#commentModel.comments;
-        break;
-      default:
+      case UpdateType.PATCH:
+      case UpdateType.MINOR:
+      case UpdateType.MAJOR:
         if (update.cardId !== undefined) {
           if (update.cardId === this.#card.id) {
             this.#cardModel.updateCard(
