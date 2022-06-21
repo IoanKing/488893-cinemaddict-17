@@ -9,11 +9,6 @@ export default class CardModel extends Observable {
   constructor(cardsApiService) {
     super();
     this.#cardsApiService = cardsApiService;
-
-    this.#cardsApiService.cards.then((cards) => {
-      console.log("Исходный массив фильмов", cards);
-      console.log("Адаптированный массив", cards.map(this.#adaptToClient));
-    });
   }
 
   init = async () => {
@@ -38,7 +33,7 @@ export default class CardModel extends Observable {
     }
 
     try {
-      const response = await this.cardsApiService.updateCard(update);
+      const response = await this.#cardsApiService.updateCard(update);
       const updatedTask = this.#adaptToClient(response);
       this.#cards = [
         ...this.#cards.slice(0, index),
@@ -73,7 +68,7 @@ export default class CardModel extends Observable {
           date: movie['film_info']['release']['date'],
           releaseCountry: movie['film_info']['release']['release_country']
         },
-        runtime: movie['film_info']['reruntimelease'],
+        runtime: movie['film_info']['runtime'],
         genre: movie['film_info']['genre'],
         description: movie['film_info']['description']
       }

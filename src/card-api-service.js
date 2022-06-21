@@ -71,12 +71,12 @@ export default class CardsApiService extends ApiService {
         'runtime': movie.filmInfo.runtime,
         'genre': movie.filmInfo.genre,
         'description': movie.filmInfo.description,
-        'user_details': {
-          'watchlist': movie.userDetails.watchlist,
-          'already_watched': movie.userDetails.isAlreadyWatched,
-          'watching_date': movie.userDetails.watchingDate instanceof Date ? movie.userDetails.watchingDate.toISOString() : null,
-          'favorite': movie.userDetails.favorite
-        },
+      },
+      'user_details': {
+        'watchlist': movie.userDetails.watchlist,
+        'already_watched': movie.userDetails.isAlreadyWatched,
+        'watching_date': movie.userDetails.watchingDate instanceof Date ? movie.userDetails.watchingDate.toISOString() : null,
+        'favorite': movie.userDetails.favorite
       }
     };
 

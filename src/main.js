@@ -8,7 +8,7 @@ import ProfilePresenter from './presenter/profile-presenter.js';
 import CardsApiService from './card-api-service.js';
 
 const AUTHORIZATION = 'Basic er893jdzbdw';
-const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict/';
+const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
