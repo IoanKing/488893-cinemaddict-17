@@ -212,10 +212,9 @@ export default class NewPopupView extends AbstractStatefulView {
 
   static parseStateToComment = (state) => {
     const newComment = {
-      id: state.commentId,
-      text: state.commentText,
-      emotion: state.emotionIcon,
-      cardId: state.card.id
+      movieId: state.card.id,
+      comment: state.commentText,
+      emotion: state.emotionIcon
     };
     return newComment;
   };

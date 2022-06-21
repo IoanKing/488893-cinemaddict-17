@@ -26,11 +26,11 @@ export default class CardsApiService extends ApiService {
     return parsedResponse;
   };
 
-  addComment= async (movie, comment) => {
+  addComment= async (comment) => {
     const response = await this._load({
-      url: `comments/${movie.id}`,
+      url: `comments/${comment.movieId}`,
       method: Method.POST,
-      body: JSON.stringify(this.#adaptToServer(comment)),
+      body: JSON.stringify(this.#adaptCommentToServer(comment)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
@@ -84,5 +84,11 @@ export default class CardsApiService extends ApiService {
     delete adaptedCard.filmInfo;
 
     return adaptedCard;
+  };
+
+  #adaptCommentToServer = (comment) => {
+    const adaptedComment = {...comment};
+    delete adaptedComment.movieId;
+    return adaptedComment;
   };
 }

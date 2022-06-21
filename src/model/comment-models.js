@@ -31,7 +31,8 @@ export default class CommentModel extends Observable {
       this.#comments = [newComment, ...this.#comments];
       this._notify(updateType, newComment);
     } catch(err) {
-      throw new Error('Can\'t add task');
+      console.log(err);
+      throw new Error('Can\'t add comment');
     }
   };
 
@@ -39,7 +40,7 @@ export default class CommentModel extends Observable {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting card');
+      throw new Error('Can\'t delete unexisting comment');
     }
 
     try {
@@ -53,7 +54,8 @@ export default class CommentModel extends Observable {
       ];
       this._notify(updateType);
     } catch(err) {
-      throw new Error('Can\'t delete task');
+      console.log(err);
+      throw new Error('Can\'t delete comment');
     }
   };
 

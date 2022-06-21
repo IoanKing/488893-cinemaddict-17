@@ -83,28 +83,15 @@ export default class CardPresenter {
     this.#popupPresentor = popupPresenter;
   };
 
-  #onCommentAction = (updateType, update) => {
+  #onCommentAction = (updateType) => {
     switch (updateType) {
       case UpdateType.PATCH:
       case UpdateType.MINOR:
       case UpdateType.MAJOR:
-        if (update.cardId !== undefined) {
-          if (update.cardId === this.#card.id) {
-            this.#cardModel.updateCard(
-              updateType,
-              {...this.#card, comments: this.#card.comments.add(update.id)},
-            );
-          }
-        } else {
-          const hasComment = this.#card.comments.has(update.id);
-          if (hasComment) {
-            this.#card.comments.delete(update.id);
-            this.#cardModel.updateCard(
-              updateType,
-              {...this.#card, comments: this.#card.comments},
-            );
-          }
-        }
+        this.#cardModel.updateCard(
+          updateType,
+          {...this.#card},
+        );
     }
   };
 
