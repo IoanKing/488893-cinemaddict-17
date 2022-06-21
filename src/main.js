@@ -1,6 +1,5 @@
-import NewStatisticView from './view/statistics-view.js';
+import StatisticPresenter from './presenter/statistic-presenter.js';
 import BoardPresenter from './presenter/boad-presenter.js';
-import {render} from './framework/render.js';
 import CardModel from './model/card-models.js';
 import CommentModel from './model/comment-models.js';
 import FilterModel from './model/filter-model.js';
@@ -22,10 +21,11 @@ const commentModel = new CommentModel(new CardsApiService(END_POINT, AUTHORIZATI
 const profilePresenter = new ProfilePresenter(siteHeaderElement, cardModel);
 const filterPresentor = new FilterPresenter(siteMainElement, filterModel, cardModel);
 const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel, filterModel);
+new StatisticPresenter(siteStatisticsElement, cardModel);
 
 profilePresenter.init();
 filterPresentor.init();
 boardPresenter.init();
-render(new NewStatisticView(cardModel), siteStatisticsElement);
 cardModel.init();
+
 

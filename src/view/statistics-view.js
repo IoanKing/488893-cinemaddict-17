@@ -2,15 +2,19 @@ import AbstractView from '../framework/view/abstract-view.js';
 
 const createStatisticTemplate = (count) => `<p>${count} movies inside</p>`;
 
-export default class NewStatisticView extends AbstractView {
-  #count = 0;
+export default class StatisticView extends AbstractView {
+  #cardModel = null;
+
+  get count() {
+    return this.#cardModel.cards.length;
+  }
 
   constructor(cardModel) {
     super();
-    this.#count = cardModel.cards.length;
+    this.#cardModel = cardModel;
   }
 
   get template() {
-    return createStatisticTemplate(this.#count);
+    return createStatisticTemplate(this.count);
   }
 }
