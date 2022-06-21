@@ -24,28 +24,37 @@ export default class CommentModel extends Observable {
     return this.#comments;
   }
 
-  addComment = (updateType, update) => {
-    const newElement = generateComment(update);
-    this.#comments = [
-      newElement,
-      ...this.#comments,
-    ];
-    this._notify(updateType, update);
+  addComment= async (updateType, update) => {
+    try {
+      const response = await this.#commentApiService.addComment(update);
+      const newComment = this.#adaptToClient(response);
+      this.#comments = [newComment, ...this.#comments];
+      this._notify(updateType, newComment);
+    } catch(err) {
+      throw new Error('Can\'t add task');
+    }
   };
 
-  deleteComment = (updateType, update) => {
+  deleteComment = async (updateType, update) => {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting comment');
+      throw new Error('Can\'t delete unexisting card');
     }
 
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
-
-    this._notify(updateType, update);
+    try {
+      // Обратите внимание, метод удаления задачи на сервере
+      // ничего не возвращает. Это и верно,
+      // ведь что можно вернуть при удалении задачи?
+      await this.#commentApiService.deleteComment(update);
+      this.#comments = [
+        ...this.#comments.slice(0, index),
+        ...this.#comments.slice(index + 1),
+      ];
+      this._notify(updateType);
+    } catch(err) {
+      throw new Error('Can\'t delete task');
+    }
   };
 
   #adaptToClient = (comment) => {

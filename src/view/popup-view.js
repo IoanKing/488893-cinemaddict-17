@@ -5,7 +5,6 @@ import {
   onCtrlEnterKeydown,
   debounce
 } from '../utils/utils.js';
-import {nanoid} from 'nanoid';
 import he from 'he';
 
 const BLANK_CARD = {
@@ -204,7 +203,6 @@ export default class NewPopupView extends AbstractStatefulView {
   static parseCardToState = (data) => ({
     card: {...data},
     scrollPosition: 0,
-    commentId: nanoid(),
     emotionIcon: null,
     commentText: '',
     isWatchList: data.userDetails.watchlist,
