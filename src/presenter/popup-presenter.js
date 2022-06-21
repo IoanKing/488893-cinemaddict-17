@@ -8,7 +8,6 @@ export default class PopupPresenter {
   #commentModel = null;
   #card = null;
   #cardModel = null;
-  #comments = null;
 
   #elementComponent = null;
   #popupComponent = null;
@@ -19,7 +18,7 @@ export default class PopupPresenter {
     this.#elementComponent = elementComponent;
     this.#commentModel = commentModel;
     this.#cardModel = cardModel;
-    this.#commentModel.addObserver(this.#renderCommentList);
+    this.#commentModel.addObserver(this.#onCommentAction);
   }
 
   get card() {
@@ -36,7 +35,6 @@ export default class PopupPresenter {
 
   init = (card) => {
     this.#card = card;
-    this.#commentModel.init(card);
 
     const prevPopupComponent = this.#popupComponent;
 
@@ -59,6 +57,7 @@ export default class PopupPresenter {
   };
 
   destroy = () => {
+    this.#commentModel.removeObserver(this.#onCommentAction);
     this.#removePopup();
   };
 
@@ -78,17 +77,21 @@ export default class PopupPresenter {
     this.#setHandlers();
   };
 
-  #renderCommentList = (updateType) => {
+  #onCommentAction = (updateType) => {
     switch (updateType) {
       case UpdateType.INIT:
-        this.init();
+        this.#renderCommentList();
         break;
-      default:
-        if (this.#commentPresentor !== null) {
-          this.#commentPresentor.forEach((presenter) => presenter.destroy());
-          this.#commentPresentor.clear();
-        }
-        this.#comments.forEach((comment) => this.#renderComment(comment));
+    }
+  };
+
+  #renderCommentList = () => {
+    if (this.#commentPresentor !== null) {
+      this.#commentPresentor.forEach((presenter) => presenter.destroy());
+      this.#commentPresentor.clear();
+    }
+    if (this.#commentModel.comments !== null) {
+      this.#commentModel.comments.forEach((comment) => this.#renderComment(comment));
     }
   };
 

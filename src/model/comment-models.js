@@ -24,14 +24,14 @@ export default class CommentModel extends Observable {
     return this.#comments;
   }
 
-  // addComment = (updateType, update) => {
-  //   const newElement = generateComment(update);
-  //   this.#comments = [
-  //     newElement,
-  //     ...this.#comments,
-  //   ];
-  //   this._notify(updateType, update);
-  // };
+  addComment = (updateType, update) => {
+    const newElement = generateComment(update);
+    this.#comments = [
+      newElement,
+      ...this.#comments,
+    ];
+    this._notify(updateType, update);
+  };
 
   deleteComment = (updateType, update) => {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);

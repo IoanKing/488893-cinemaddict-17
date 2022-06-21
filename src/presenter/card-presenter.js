@@ -77,7 +77,6 @@ export default class CardPresenter {
     this.#commentModel.init(card);
     this.#onPopupOpen();
     const popupPresenter = new PopupPresenter(bodyComponent, this.#cardModel, this.#commentModel);
-    this.#commentModel.init(card);
     popupPresenter.init(card);
 
     this.#popupPresentor = popupPresenter;
