@@ -20,7 +20,6 @@ export default class PopupPresenter {
     this.#commentModel = commentModel;
     this.#cardModel = cardModel;
     this.#commentModel.addObserver(this.#renderCommentList);
-    console.log(this.#commentModel.comments);
   }
 
   get card() {
