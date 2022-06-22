@@ -752,7 +752,11 @@ button {
   text-decoration: underline;
   border: none;
 }
-.film-details__comment-delete:hover {
+.film-details__comment-delete:disabled {
+  color: #a6a6a6;
+  text-decoration: none;
+}
+.film-details__comment-delete:hover:not([disabled]) {
   opacity: 0.7;
 }
 .film-details__comment-input {
@@ -771,6 +775,9 @@ button {
 }
 .film-details__comment-input::placeholder {
   color: #212126;
+}
+.film-details__comment-input:disabled {
+  background-color: #a6a6a6;
 }
 .film-details__comment-label {
   width: 100%;

@@ -62,6 +62,7 @@ const createEmotionTemplate = (emotion) => {
 const createPopupTemplate = (data) => {
   const {commentText, emotionIcon, isWatchList, isWatched, isFavorite, card, isDisabled, isSaving} = data;
   const {filmInfo} = card;
+  const {comments} = card;
 
   const watchListClassName = isWatchList
     ? 'film-details__control-button--active'
@@ -147,7 +148,7 @@ const createPopupTemplate = (data) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count"></span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${(comments !== null) ? comments.length : ''}</span></h3>
 
           <ul class="film-details__comments-list">
           </ul>
@@ -297,9 +298,11 @@ export default class NewPopupView extends AbstractStatefulView {
   #submitFormHandler = (evt) => {
     if (onCtrlEnterKeydown(evt)) {
       evt.preventDefault();
-      this._state.isDisabled = true;
-      this._state.isSaving = true;
-      this._callback.formSubmit(NewPopupView.parseStateToComment(this._state));
+      if (this._state.emotionIcon !== null) {
+        this._state.isDisabled = true;
+        this._state.isSaving = true;
+        this._callback.formSubmit(NewPopupView.parseStateToComment(this._state));
+      }
     }
   };
 
