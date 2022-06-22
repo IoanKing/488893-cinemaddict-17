@@ -43,11 +43,22 @@ export default class CommentPresenter {
     this.#commentComponent.setDeleteHandler(this.#onDeleteComment);
   };
 
-  #onDeleteComment = (data) => {
+  #onDeleteComment = async (data) => {
+    try {
+      this.#commentComponent.updateElement({
+        isDeleting: true
+      });
+      await this.#commentModel.deleteComment(UpdateType.PATCH, data);
+    } catch(err) {
+      this.setAborting();
+    }
+  };
+
+  setAborting = () => {
     this.#commentComponent.updateElement({
-      isDeleting: true
+      isDeleting: false
     });
-    this.#commentModel.deleteComment(UpdateType.PATCH, data);
+    this.#commentComponent.shake();
   };
 
   #onCommentAction = (updateType, update) => {

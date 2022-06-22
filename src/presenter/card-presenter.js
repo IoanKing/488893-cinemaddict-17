@@ -95,7 +95,7 @@ export default class CardPresenter {
     }
   };
 
-  #onControlActionClick = (controlAction) => {
+  #onControlActionClick = async (controlAction) => {
     const watchlistDetail = (controlAction === 'watchlist') ? !this.#card.userDetails.watchlist : this.#card.userDetails.watchlist;
 
     const isAlreadyWatchedDetail = (controlAction === 'watched') ? !this.#card.userDetails.isAlreadyWatched : this.#card.userDetails.isAlreadyWatched;
@@ -104,15 +104,27 @@ export default class CardPresenter {
 
     const favoriteDetail = (controlAction === 'favorite') ? !this.#card.userDetails.favorite : this.#card.userDetails.favorite;
 
-    this.#cardModel.updateCard(
-      UpdateType.MINOR,
-      {...this.#card, userDetails: {
-        ...this.#card.userDetails,
-        watchlist: watchlistDetail,
-        isAlreadyWatched: isAlreadyWatchedDetail,
-        watchingDate: watchingDateDetail,
-        favorite: favoriteDetail,
-      }},
-    );
+    try {
+      await this.#cardModel.updateCard(
+        UpdateType.MINOR,
+        {...this.#card, userDetails: {
+          ...this.#card.userDetails,
+          watchlist: watchlistDetail,
+          isAlreadyWatched: isAlreadyWatchedDetail,
+          watchingDate: watchingDateDetail,
+          favorite: favoriteDetail,
+        }},
+      );
+    } catch(err) {
+      this.setAborting();
+    }
+  };
+
+  setAborting = () => {
+    this.#cardComponent.shake();
+
+    if (this.#popupPresentor !== null) {
+      this.#popupPresentor.setAborting();
+    }
   };
 }

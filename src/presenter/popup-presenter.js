@@ -71,8 +71,12 @@ export default class PopupPresenter {
     this.#commentPresentor.set(comment.id, commentsPresenter);
   };
 
-  #onCommentAdd = (data) => {
-    this.#commentModel.addComment(UpdateType.PATCH, data);
+  #onCommentAdd = async (data) => {
+    try {
+      this.#commentModel.addComment(UpdateType.PATCH, data);
+    } catch(err) {
+      this.setAborting();
+    }
   };
 
   #onEmotionClick = () => {
@@ -86,6 +90,20 @@ export default class PopupPresenter {
       isSaving: true
     });
     this.#renderCommentList();
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#popupComponent.updateElement({
+        isWatchList: this.#card.userDetails.watchlist,
+        isWatched: this.#card.userDetails.isAlreadyWatched,
+        isFavorite: this.#card.userDetails.favorite,
+        isDisabled: false,
+        isSaving: false
+      });
+    };
+
+    this.#popupComponent.shake(resetFormState);
   };
 
   #onCommentAction = (updateType, update) => {
@@ -163,19 +181,23 @@ export default class PopupPresenter {
     this.#removePopup();
   };
 
-  #onCardControlClick = (data) => {
+  #onCardControlClick = async (data) => {
     const {card, isWatchList, isWatched, isFavorite} = data;
 
-    this.#cardModel.updateCard(
-      UpdateType.MINOR,
-      {...card, userDetails: {
-        ...card.userDetails,
-        watchlist: isWatchList,
-        isAlreadyWatched: isWatched,
-        favorite: isFavorite,
-      }},
-    );
-    this.#renderCommentList();
-    this.#setHandlers();
+    try {
+      await this.#cardModel.updateCard(
+        UpdateType.MINOR,
+        {...card, userDetails: {
+          ...card.userDetails,
+          watchlist: isWatchList,
+          isAlreadyWatched: isWatched,
+          favorite: isFavorite,
+        }},
+      );
+      this.#renderCommentList();
+      this.#setHandlers();
+    } catch(err) {
+      this.setAborting();
+    }
   };
 }

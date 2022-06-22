@@ -25,7 +25,6 @@ const createCommentTemplate = (data) => {
 };
 
 export default class NewCommentView extends AbstractStatefulView {
-  #comment = null;
 
   constructor(comment) {
     super();
@@ -58,6 +57,6 @@ export default class NewCommentView extends AbstractStatefulView {
   };
 
   _restoreHandlers = () => {
-    this.setDeleteHandler();
+    this.setDeleteHandler(this._callback.deleteComment);
   };
 }
