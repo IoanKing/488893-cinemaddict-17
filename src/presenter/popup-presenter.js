@@ -65,8 +65,8 @@ export default class PopupPresenter {
   };
 
   #renderComment = (comment) => {
-    const commentsPresenter = new CommentPresenter(this.commentListComponent);
-    commentsPresenter.init(comment, this.#commentModel);
+    const commentsPresenter = new CommentPresenter(this.commentListComponent, this.#commentModel);
+    commentsPresenter.init(comment);
 
     this.#commentPresentor.set(comment.id, commentsPresenter);
   };
@@ -97,7 +97,9 @@ export default class PopupPresenter {
         break;
       default:
         if (update !== undefined) {
-          this.destroy();
+          if (Object.keys(update).indexOf('isSaving') >= 0) {
+            this.destroy();
+          }
         }
         break;
     }
@@ -135,7 +137,6 @@ export default class PopupPresenter {
   #onSubmit = (element) => {
     this.setSaving();
     this.#onCommentAdd(element);
-    //this.#removePopup();
   };
 
   #addPopup = () => {

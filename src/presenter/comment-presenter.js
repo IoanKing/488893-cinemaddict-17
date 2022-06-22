@@ -8,13 +8,14 @@ export default class CommentPresenter {
   #comment = null;
   #commentComponent = null;
 
-  constructor(component) {
+  constructor(component, commentModel) {
     this.#component = component;
+    this.#commentModel = commentModel;
+    this.#commentModel.addObserver(this.#onCommentAction);
   }
 
-  init = (comment, commentModel) => {
+  init = (comment) => {
     this.#comment = comment;
-    this.#commentModel = commentModel;
 
     const prevCommentComponent = this.#commentComponent;
 
@@ -43,7 +44,21 @@ export default class CommentPresenter {
   };
 
   #onDeleteComment = (data) => {
+    this.#commentComponent.updateElement({
+      isDeleting: true
+    });
     this.#commentModel.deleteComment(UpdateType.PATCH, data);
-    this.destroy();
+  };
+
+  #onCommentAction = (updateType, update) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        if (Object.keys(update).indexOf('id') >= 0) {
+          if (update.id === this.#comment.id) {
+            this.destroy();
+          }
+        }
+        break;
+    }
   };
 }
