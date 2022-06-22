@@ -2,8 +2,7 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {
   getHumanReadableTime,
   getHumanReadableDate,
-  onCtrlEnterKeydown,
-  debounce
+  onCtrlEnterKeydown
 } from '../utils/utils.js';
 import he from 'he';
 
@@ -61,7 +60,7 @@ const createEmotionTemplate = (emotion) => {
  * @returns - Шаблон.
  */
 const createPopupTemplate = (data) => {
-  const {commentText, emotionIcon, isWatchList, isWatched, isFavorite, card} = data;
+  const {commentText, emotionIcon, isWatchList, isWatched, isFavorite, card, isDisabled, isSaving} = data;
   const {filmInfo} = card;
 
   const watchListClassName = isWatchList
@@ -154,29 +153,29 @@ const createPopupTemplate = (data) => {
           </ul>
 
           <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label">${createEmotionTemplate(emotionIcon)}</div>
+            <div class="film-details__add-emoji-label">${(isSaving) ? '' : createEmotionTemplate(emotionIcon)}</div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(commentText)}</textarea>
+              <textarea class="film-details__comment-input" placeholder="${isSaving ? 'Saving...' : 'Select reaction below and write comment here'}" name="comment" ${isSaving || isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : he.encode(commentText)}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${(emotionIcon === 'smile') ? 'checked' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${(emotionIcon === 'smile') ? 'checked' : ''} ${isSaving || isDisabled ? 'disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-smile">
                 <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${(emotionIcon === 'sleeping') ? 'checked' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${(emotionIcon === 'sleeping') ? 'checked' : ''} ${isSaving || isDisabled ? 'disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-sleeping">
                 <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${(emotionIcon === 'puke') ? 'checked' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${(emotionIcon === 'puke') ? 'checked' : ''} ${isSaving || isDisabled ? 'disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-puke">
                 <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${(emotionIcon === 'angry') ? 'checked' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${(emotionIcon === 'angry') ? 'checked' : ''} ${isSaving || isDisabled ? 'disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-angry">
                 <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
               </label>
@@ -207,14 +206,17 @@ export default class NewPopupView extends AbstractStatefulView {
     commentText: '',
     isWatchList: data.userDetails.watchlist,
     isWatched: data.userDetails.isAlreadyWatched,
-    isFavorite: data.userDetails.favorite
+    isFavorite: data.userDetails.favorite,
+    isDisabled: false,
+    isSaving: false
   });
 
   static parseStateToComment = (state) => {
     const newComment = {
       movieId: state.card.id,
       comment: state.commentText,
-      emotion: state.emotionIcon
+      emotion: state.emotionIcon,
+      isSaving: state.isSaving
     };
     return newComment;
   };
@@ -225,6 +227,8 @@ export default class NewPopupView extends AbstractStatefulView {
     delete updatedCard.commentId;
     delete updatedCard.emotionIcon;
     delete updatedCard.commentText;
+    delete updatedCard.isDisabled;
+    delete updatedCard.isSaving;
     return updatedCard;
   };
 
@@ -233,7 +237,7 @@ export default class NewPopupView extends AbstractStatefulView {
   }
 
   get scrollPosition() {
-    return this.element.scrollTop;
+    return this._state.scrollPosition;
   }
 
   set scrollPosition(position) {
@@ -249,10 +253,10 @@ export default class NewPopupView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element
       .querySelectorAll('.film-details__emoji-item')
-      .forEach((element) => element.addEventListener('click', debounce(this.#onEmotionClick)));
+      .forEach((element) => element.addEventListener('click', this.#onEmotionClick));
     this.element
       .querySelector('.film-details__comment-input')
-      .addEventListener('input', debounce(this.#commentInputHandler));
+      .addEventListener('input', this.#commentInputHandler);
   };
 
   _restoreHandlers = () => {
@@ -293,6 +297,8 @@ export default class NewPopupView extends AbstractStatefulView {
   #submitFormHandler = (evt) => {
     if (onCtrlEnterKeydown(evt)) {
       evt.preventDefault();
+      this._state.isDisabled = true;
+      this._state.isSaving = true;
       this._callback.formSubmit(NewPopupView.parseStateToComment(this._state));
     }
   };

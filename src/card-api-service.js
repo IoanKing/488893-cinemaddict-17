@@ -89,6 +89,7 @@ export default class CardsApiService extends ApiService {
   #adaptCommentToServer = (comment) => {
     const adaptedComment = {...comment};
     delete adaptedComment.movieId;
+    delete adaptedComment.isSaving;
     return adaptedComment;
   };
 }

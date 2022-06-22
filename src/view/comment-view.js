@@ -8,7 +8,7 @@ import he from 'he';
  * @returns - Шаблон.
  */
 const createCommentTemplate = (data) => {
-  const {emotion, comment, author, date} = data;
+  const {emotion, comment, author, date, isDeleting} = data;
   return `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
       <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
@@ -29,11 +29,23 @@ export default class NewCommentView extends AbstractStatefulView {
 
   constructor(comment) {
     super();
-    this.#comment = comment;
+    this._state = NewCommentView.parseCommentToState(comment);
   }
 
+  static parseCommentToState = (comment) => ({
+    ...comment,
+    isDeleting: false
+  });
+
+  static parseStateToComment = (state) => {
+    const newComment = {...state};
+    delete newComment.isDeleting;
+    return newComment;
+  };
+
+
   get template() {
-    return createCommentTemplate(this.#comment);
+    return createCommentTemplate(this._state);
   }
 
   setDeleteHandler = (callback) => {
@@ -43,6 +55,6 @@ export default class NewCommentView extends AbstractStatefulView {
 
   #deleteCommentHandler = (evt) => {
     evt.preventDefault();
-    this._callback.deleteComment(this.#comment);
+    this._callback.deleteComment(NewCommentView.parseStateToComment(this._state));
   };
 }

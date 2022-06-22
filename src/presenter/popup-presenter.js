@@ -80,12 +80,25 @@ export default class PopupPresenter {
     this.#setHandlers();
   };
 
-  #onCommentAction = (updateType) => {
+  setSaving = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      isSaving: true
+    });
+    this.#renderCommentList();
+  };
+
+  #onCommentAction = (updateType, update) => {
     switch (updateType) {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
         this.#renderCommentList();
+        break;
+      default:
+        if (update !== undefined) {
+          this.destroy();
+        }
         break;
     }
   };
@@ -120,8 +133,9 @@ export default class PopupPresenter {
   };
 
   #onSubmit = (element) => {
+    this.setSaving();
     this.#onCommentAdd(element);
-    this.#removePopup();
+    //this.#removePopup();
   };
 
   #addPopup = () => {
