@@ -7,7 +7,7 @@ export default class ShowButtonPresenter {
   #callback = null;
 
   constructor(elementComponent) {
-    this.elementComponent = elementComponent;
+    this.#elementComponent = elementComponent;
   }
 
   init = (cb) => {
@@ -21,7 +21,7 @@ export default class ShowButtonPresenter {
   };
 
   #renderShowMoreButton = () => {
-    render(this.#component, this.elementComponent);
+    render(this.#component, this.#elementComponent);
     this.#component.setClickHandler(this.#callback);
   };
 }

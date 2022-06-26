@@ -8,12 +8,10 @@ const bodyComponent = document.querySelector('body');
 export default class CardPresenter {
   #cardListContainer = null;
   #commentModel = null;
-  #comments = null;
   #card = null;
   #cardComponent = null;
   #cardModel = null;
   _callback = {};
-  #isLoading = true;
 
   #popupPresenter = null;
   #onPopupOpen = false;

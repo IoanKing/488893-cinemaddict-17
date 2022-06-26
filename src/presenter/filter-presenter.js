@@ -4,7 +4,6 @@ import {FilterType, UpdateType} from '../const.js';
 import {filter} from '../utils/filter.js';
 
 export default class FilterPresenter {
-  #cards = null;
   #filterContainer = null;
   #filterModel = null;
   #cardModel = null;
