@@ -1,20 +1,21 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import {RankType, RankCount} from '../const.js';
 
 const createProffileTemplate = (rank) => {
   let rankText = '';
 
   switch (true) {
-    case rank < 1:
-      rankText = '';
+    case rank <= RankCount.NO_RANK:
+      rankText = RankType.NO_RANK;
       break;
-    case rank <= 10:
-      rankText = 'novice';
+    case rank <= RankCount.NOVICE:
+      rankText = RankType.NOVICE;
       break;
-    case rank <= 20:
-      rankText = 'fan';
+    case rank <= RankCount.FAN:
+      rankText = RankType.FAN;
       break;
-    case rank > 21:
-      rankText = 'movie buff';
+    case rank > RankCount.FAN:
+      rankText = RankType.MOVIE_BUF;
       break;
   }
 

@@ -35,4 +35,17 @@ const CommentAction = {
   DELETE_COMMENT: 'DELETE_COMMENT',
 };
 
-export {Setting, FilterType, SortType, UserAction, UpdateType, CommentAction};
+const RankType = {
+  NO_RANK: '',
+  NOVICE: 'novice',
+  FAN: 'fan',
+  MOVIE_BUF: 'movie buf'
+};
+
+const RankCount = {
+  NO_RANK: 0,
+  NOVICE: 10,
+  FAN: 20,
+};
+
+export {Setting, FilterType, SortType, UserAction, UpdateType, CommentAction, RankType, RankCount};
