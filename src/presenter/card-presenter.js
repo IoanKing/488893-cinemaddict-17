@@ -15,7 +15,7 @@ export default class CardPresenter {
   _callback = {};
   #isLoading = true;
 
-  #popupPresentor = null;
+  #popupPresenter = null;
   #onPopupOpen = false;
 
   constructor(cardListContainer, cardModel, commentModel, onPopupOpen) {
@@ -63,9 +63,9 @@ export default class CardPresenter {
   };
 
   resetPopup = () => {
-    if (this.#popupPresentor !== null) {
-      this.#popupPresentor.destroy();
-      this.#popupPresentor = null;
+    if (this.#popupPresenter !== null) {
+      this.#popupPresenter.destroy();
+      this.#popupPresenter = null;
     }
   };
 
@@ -80,7 +80,7 @@ export default class CardPresenter {
     const popupPresenter = new PopupPresenter(bodyComponent, this.#cardModel, this.#commentModel);
     popupPresenter.init(card);
 
-    this.#popupPresentor = popupPresenter;
+    this.#popupPresenter = popupPresenter;
   };
 
   #onCommentAction = (updateType) => {
@@ -123,8 +123,8 @@ export default class CardPresenter {
   setAborting = () => {
     this.#cardComponent.shake();
 
-    if (this.#popupPresentor !== null) {
-      this.#popupPresentor.setAborting();
+    if (this.#popupPresenter !== null) {
+      this.#popupPresenter.setAborting();
     }
   };
 }

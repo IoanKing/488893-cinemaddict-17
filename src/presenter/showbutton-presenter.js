@@ -4,14 +4,14 @@ import {render, remove} from '../framework/render.js';
 export default class ShowButtonPresenter {
   #component = null;
   #elementComponent = null;
-  #collback = null;
+  #callback = null;
 
   constructor(elementComponent) {
     this.elementComponent = elementComponent;
   }
 
   init = (cb) => {
-    this.#collback = cb;
+    this.#callback = cb;
     this.#component = new NewButtonShowMoreView();
     this.#renderShowMoreButton();
   };
@@ -22,6 +22,6 @@ export default class ShowButtonPresenter {
 
   #renderShowMoreButton = () => {
     render(this.#component, this.elementComponent);
-    this.#component.setClickHandler(this.#collback);
+    this.#component.setClickHandler(this.#callback);
   };
 }

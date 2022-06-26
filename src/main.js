@@ -19,12 +19,12 @@ const cardModel = new CardModel(new CardsApiService(END_POINT, AUTHORIZATION));
 const commentModel = new CommentModel(new CardsApiService(END_POINT, AUTHORIZATION));
 
 const profilePresenter = new ProfilePresenter(siteHeaderElement, cardModel);
-const filterPresentor = new FilterPresenter(siteMainElement, filterModel, cardModel);
+const filterPresenter = new FilterPresenter(siteMainElement, filterModel, cardModel);
 const boardPresenter = new BoardPresenter(siteMainElement, cardModel, commentModel, filterModel);
 new StatisticPresenter(siteStatisticsElement, cardModel);
 
 profilePresenter.init();
-filterPresentor.init();
+filterPresenter.init();
 boardPresenter.init();
 cardModel.init();
 

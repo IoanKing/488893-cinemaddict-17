@@ -156,9 +156,9 @@ const onCtrlEnterKeydown = (evt) =>(evt.ctrlKey || evt.metaKey) && evt.key === E
 
 /**
  * Устранения дребезга.
- * @param {object} cb - Collback функция.
+ * @param {object} cb - callback функция.
  * @param {number} timeoutDelay - Задержка выполнения функции.
- * @returns - Выполнение Collback функции с задержкой.
+ * @returns - Выполнение callback функции с задержкой.
  */
 const debounce = (cb, timeoutDelay = DEBOUNCE_TIME) => {
   let timeoutId;
