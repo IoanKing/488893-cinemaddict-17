@@ -162,7 +162,7 @@ export default class PopupPresenter {
 
   #onSubmit = async (element) => {
     this.setSaving();
-
+    this.#onCommentAdd(element);
     try {
       await this.#onCommentAdd(element);
     } catch (error) {
