@@ -20,11 +20,12 @@ export default class PopupPresenter {
   #saveScroll = null;
   #popupScroll = null;
 
-  constructor(elementComponent, cardModel, commentModel, popupScroll = 0) {
+  constructor(elementComponent, cardModel, commentModel, saveScroll, popupScroll = 0) {
     this.#elementComponent = elementComponent;
     this.#commentModel = commentModel;
     this.#cardModel = cardModel;
     this.#commentModel.addObserver(this.#onCommentAction);
+    this.#saveScroll = saveScroll;
     this.#popupScroll = popupScroll;
   }
 
@@ -45,7 +46,7 @@ export default class PopupPresenter {
 
     const prevPopupComponent = this.#popupComponent;
 
-    this.#popupComponent = new NewPopupView(this.card, this.#commentModel, this.#onEmotionClick);
+    this.#popupComponent = new NewPopupView(this.card, this.#onEmotionClick);
 
     if (prevPopupComponent === null) {
       this.#addPopup();
@@ -161,8 +162,8 @@ export default class PopupPresenter {
   };
 
   #onSubmit = async (element) => {
+    this.#saveScroll(this.#popupComponent.scrollPosition);
     this.setSaving();
-    this.#onCommentAdd(element);
     try {
       await this.#onCommentAdd(element);
     } catch (error) {
@@ -173,7 +174,7 @@ export default class PopupPresenter {
   #addPopup = () => {
     render(this.#popupComponent, this.#elementComponent);
     this.#elementComponent.classList.add('hide-overflow');
-    this.#popupComponent.element.scrollTo(0, this.#popupScroll);
+    this.#popupComponent.scrollPosition = this.#popupScroll;
     this.#setHandlers();
     this.#renderCommentList();
   };

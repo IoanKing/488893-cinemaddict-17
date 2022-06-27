@@ -189,13 +189,11 @@ const createPopupTemplate = (data) => {
 };
 
 export default class NewPopupView extends AbstractStatefulView {
-  #comments = null;
   #onEmotionChange = null;
 
-  constructor(card = BLANK_CARD, commentModel, onEmotionChange) {
+  constructor(card = BLANK_CARD, onEmotionChange) {
     super();
     this._state = NewPopupView.parseCardToState(card);
-    this.#comments = commentModel.comments;
     this.#onEmotionChange = onEmotionChange;
     this.#setInnerHandlers();
   }

@@ -83,6 +83,7 @@ export default class CardPresenter {
   };
 
   #saveScroll = (scroll) => {
+    console.log(scroll);
     if (scroll) {
       this.#popupScroll = scroll;
     }
