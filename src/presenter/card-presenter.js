@@ -15,6 +15,7 @@ export default class CardPresenter {
 
   #popupPresenter = null;
   #onPopupOpen = false;
+  #popupScroll = null;
 
   constructor(cardListContainer, cardModel, commentModel, onPopupOpen) {
     this.#cardListContainer = cardListContainer;
@@ -75,15 +76,34 @@ export default class CardPresenter {
   #renderPopup = (card) => {
     this.#commentModel.init(card);
     this.#onPopupOpen();
-    const popupPresenter = new PopupPresenter(bodyComponent, this.#cardModel, this.#commentModel);
+    const popupPresenter = new PopupPresenter(bodyComponent, this.#cardModel, this.#commentModel, this.#saveScroll, this.#popupScroll);
     popupPresenter.init(card);
 
     this.#popupPresenter = popupPresenter;
   };
 
-  #onCommentAction = (updateType) => {
+  #saveScroll = (scroll) => {
+    if (scroll) {
+      this.#popupScroll = scroll;
+    }
+  };
+
+  #onCommentAction = async (updateType) => {
     switch (updateType) {
       case UpdateType.PATCH:
+        try {
+          await this.#cardModel.updateCard(
+            updateType,
+            {...this.#card},
+          );
+          if (this.#popupPresenter) {
+            this.resetPopup();
+            this.#renderPopup(this.#card);
+          }
+        } catch {
+          break;
+        }
+        break;
       case UpdateType.MINOR:
       case UpdateType.MAJOR:
         this.#cardModel.updateCard(

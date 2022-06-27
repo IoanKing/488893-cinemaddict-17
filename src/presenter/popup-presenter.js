@@ -1,6 +1,6 @@
 import {render, remove, replace, RenderPosition} from '../framework/render.js';
 import NewPopupView from '../view/popup-view.js';
-import {onEscKeydown} from '../utils/utils.js';
+import {onEscKeydown, shakeElement} from '../utils/utils.js';
 import CommentPresenter from '../presenter/comment-presenter.js';
 import {UpdateType} from '../const.js';
 import LoadingView from '../view/loading-view.js';
@@ -17,11 +17,15 @@ export default class PopupPresenter {
   #loadingComponent = new LoadingView();
   #isLoading = true;
 
-  constructor(elementComponent, cardModel, commentModel) {
+  #saveScroll = null;
+  #popupScroll = null;
+
+  constructor(elementComponent, cardModel, commentModel, popupScroll = 0) {
     this.#elementComponent = elementComponent;
     this.#commentModel = commentModel;
     this.#cardModel = cardModel;
     this.#commentModel.addObserver(this.#onCommentAction);
+    this.#popupScroll = popupScroll;
   }
 
   get card() {
@@ -73,7 +77,7 @@ export default class PopupPresenter {
 
   #onCommentAdd = async (data) => {
     try {
-      this.#commentModel.addComment(UpdateType.PATCH, data);
+      await this.#commentModel.addComment(UpdateType.PATCH, data);
     } catch(err) {
       this.setAborting();
     }
@@ -102,8 +106,10 @@ export default class PopupPresenter {
         isSaving: false
       });
     };
-
-    this.#popupComponent.shake(resetFormState);
+    shakeElement(document.querySelector('.film-details__inner'), resetFormState);
+    setTimeout(() => {
+      this.#onEmotionClick();
+    }, 1000);
   };
 
   #onCommentAction = (updateType, update) => {
@@ -112,6 +118,8 @@ export default class PopupPresenter {
         this.#isLoading = false;
         remove(this.#loadingComponent);
         this.#renderCommentList();
+        break;
+      case UpdateType.PATCH:
         break;
       default:
         if (update !== undefined) {
@@ -152,14 +160,19 @@ export default class PopupPresenter {
     this.#popupComponent.setWatchedClickHandler(this.#onCardControlClick);
   };
 
-  #onSubmit = (element) => {
+  #onSubmit = async (element) => {
     this.setSaving();
-    this.#onCommentAdd(element);
+    try {
+      await this.#onCommentAdd(element);
+    } catch (error) {
+      this.setAborting();
+    }
   };
 
   #addPopup = () => {
     render(this.#popupComponent, this.#elementComponent);
     this.#elementComponent.classList.add('hide-overflow');
+    this.#popupComponent.element.scrollTo(0, this.#popupScroll);
     this.#setHandlers();
     this.#renderCommentList();
   };
