@@ -302,6 +302,8 @@ export default class NewPopupView extends AbstractStatefulView {
         this._state.isDisabled = true;
         this._state.isSaving = true;
         this._callback.formSubmit(NewPopupView.parseStateToComment(this._state));
+        this._state.emotionIcon = null;
+        this._state.commentText = '';
       }
     }
   };

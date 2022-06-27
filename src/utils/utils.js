@@ -12,6 +12,8 @@ const ESC_ALL_BROWSERS = 'Escape';
 const ESC_IE = 'Esc';
 const ENTER_ALL_BROWSERS = 'Enter';
 const DEBOUNCE_TIME = 500;
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 /**
  * Получение человекочитаемого Года из даты в формате UTC.
@@ -82,6 +84,14 @@ const debounce = (cb, timeoutDelay = DEBOUNCE_TIME) => {
  */
 const getDescriptionShort = (text) => `${text.substring(0, Setting.MAX_TEXT_LENGTH)}${(text.length > Setting.MAX_TEXT_LENGTH) ? '...' : ''} `;
 
+const shakeElement = (element, callback) => {
+  element.classList.add(SHAKE_CLASS_NAME);
+  setTimeout(() => {
+    element.classList.remove(SHAKE_CLASS_NAME);
+    callback?.();
+  }, SHAKE_ANIMATION_TIMEOUT);
+};
+
 export {
   getYearDate,
   getHumanReadableTime,
@@ -90,5 +100,6 @@ export {
   onEscKeydown,
   onCtrlEnterKeydown,
   debounce,
-  getDescriptionShort
+  getDescriptionShort,
+  shakeElement
 };
